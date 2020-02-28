@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+
+<html>
+<!-- note to self: npm live-server to test non-AJAX stuff only -->
+<head>
+	<title>Don't Stop Running</title>
+	<!-- Required whatsits -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<!-- CSS stylesheets -->
+	<link rel="stylesheet" type="text/css" href="normalize.css">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+
+</head>
+
+<body>
+	<!-- CSS grid for broad layout, flexbox for smaller 1-dimensional things like navmenus, etc -->
+	<main>
+
+		<div id="background">
+			<div class="bg" id="bg__layer0"></div>
+			<div class="bg" id="bg__layer1"></div>
+			<div class="bg" id="bg__layer2"></div>
+			<div class="bg" id="bg__layer3"></div>
+		</div>
+
+		<div id="top-words">
+			<h1 id="game-title">Don't Stop Running!</h1>
+			<div id="score">
+			</div>
+		</div>
+
+		<div id="foreground">
+			<div id="character">
+				<!-- Character pieces nested for more intuitive transforms -->
+				
+				<div id="torso">
+					<div id="head"></div>
+					<div id="bicep-right">
+						<div id="forearm-right"></div>
+					</div>
+					<div id="bicep-left">
+						<div id="forearm-left"></div>
+					</div>
+					<div id="hips">
+						<div id="thigh-right">
+							<div id="shin-right">
+								<div id="foot-right"></div>
+							</div>
+						</div>
+						<div id="thigh-left">
+							<div id="shin-left">
+								<div id="foot-left"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+				
+			<div id="char-select-menu">
+				<button class="charselect" id="charselect__left">L</button>
+				<h2 class="charselect" id="charselect__title">Select Your Character</h2>
+				<button class="charselect" id="charselect__right">R</button>
+			</div>
+		</div>
+
+	</main>
+
+	<div id="controller">
+		<!-- build this with grid -->
+		<button class="control" id="control__flail">
+			Flail
+			<img />
+		</button>
+		<button class="control" id="control__eyes">
+			Close Eyes
+			<img />
+		</button>
+		<button class="control" id="control__run">
+			RUN!!
+			<img />
+		</button>
+		<button class="control" id="control__yell">
+			Yell
+			<img />
+		</button>
+		<button class="control" id="control__cry">
+			Cry
+			<img />
+		</button>
+		<p class="control__footer">A barely-a-game by <a href="www.KorwinBriggs.com">Korwin Briggs</a></p>
+	</div>
+
+
+	<!-- Scripts -->
+	<script type="text/javascript" src="main.js"></script>
+
+</body>
+
+</html>
