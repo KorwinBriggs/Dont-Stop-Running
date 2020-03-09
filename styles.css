@@ -1,67 +1,136 @@
-
 :root {
-    /* custom stuff can go like --main-bg-color: #141414
-    and then later I can just use --main-bg-color as a variable*/
+  /* custom stuff can go like --main-bg-color: #141414
+  and then later I can just use --main-bg-color as a variable*/
 }
 
 html, body {
-    height: 100%;
-    text-align: center;
+  height: 100%;
+  text-align: center;
 }
 
 /* body {
     overflow:hidden;
 } */
-
 h1, h2, p {
-    margin: 0;
+  margin: 0;
 }
 
 main {
-    background-color: deepskyblue;
-    height: 66%;
-    width: 100%;
+  background-color: deepskyblue;
+  height: 66%;
+  width: 100%;
 }
 
 #character-selection {
-    display: flex;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
 }
 
-
 #controller {
-    display: grid;
-    grid-template-columns: 25% 50% 25%;
-    grid-template-rows: 42% 42% 1em;
-    background-color: tomato;
-    height: 34%;
-    width: 100%;
+  display: grid;
+  grid-template-columns: 25% 50% 25%;
+  grid-template-rows: 42% 42% 1em;
+  background-color: tomato;
+  height: 34%;
+  width: 100%;
 }
 
 .control {
-    background-color: sandybrown;
+  background-color: sandybrown;
 }
 
-.control__flail {
-    grid-area: 1/1/2/2;
+#control__flail {
+  grid-area: 1/1/2/2;
 }
 
-.control__eyes {
-    grid-area: 2/1/3/2;
+#control__eyes {
+  grid-area: 2/1/3/2;
 }
 
-.control__run {
-    grid-area: 1/2/3/3;
+#control__run {
+  grid-area: 1/2/3/3;
 }
 
-.control__yell {
-    grid-area: 1/3/2/4;
+#control__yell {
+  grid-area: 1/3/2/4;
 }
 
-.control__cry {
-    grid-area: 2/3/3/4;
+#control__cry {
+  grid-area: 2/3/3/4;
 }
 
-.control__footer {
-    grid-area: 3/1/4/4;
+#control__footer {
+  grid-area: 3/1/4/4;
 }
+
+/* CHARACTER BITS */
+/* using sass to automate background-image names*/
+.man .torso-front {
+  background-image: "man-torso-front.png";
+}
+.man .torso-back {
+  background-image: "man-torso-back.png";
+}
+.man .head {
+  background-image: "man-head.png";
+}
+.man .eyes {
+  background-image: "man-eyes.png";
+}
+.man .mouth {
+  background-image: "man-mouth.png";
+}
+.man .bicep {
+  background-image: "man-bicep.png";
+}
+.man .forearm-back {
+  background-image: "man-forearm-back.png";
+}
+.man .forearm-front {
+  background-image: "man-forearm-front.png";
+}
+.man .thigh {
+  background-image: "man-thigh.png";
+}
+.man .shin {
+  background-image: "man-shin.png";
+}
+.man .foot {
+  background-image: "man-foot.png";
+}
+
+.woman .torso-front {
+  background-image: "woman-torso-front.png";
+}
+.woman .torso-back {
+  background-image: "woman-torso-back.png";
+}
+.woman .head {
+  background-image: "woman-head.png";
+}
+.woman .eyes {
+  background-image: "woman-eyes.png";
+}
+.woman .mouth {
+  background-image: "woman-mouth.png";
+}
+.woman .bicep {
+  background-image: "woman-bicep.png";
+}
+.woman .forearm-back {
+  background-image: "woman-forearm-back.png";
+}
+.woman .forearm-front {
+  background-image: "woman-forearm-front.png";
+}
+.woman .thigh {
+  background-image: "woman-thigh.png";
+}
+.woman .shin {
+  background-image: "woman-shin.png";
+}
+.woman .foot {
+  background-image: "woman-foot.png";
+}
+
+/*# sourceMappingURL=styles.css.map */

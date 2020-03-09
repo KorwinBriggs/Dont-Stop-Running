@@ -102,7 +102,8 @@ const yellButton = document.getElementById("control__yell");
 const cryButton = document.getElementById("control__cry");
 
 //GAME functions -------------------------------------------
-let running = false;
+let running = false; //for tracking mouseUps that might be outside button 
+let gameReady = false; //for disabling running until game is set/reset
 
 const loadingImage = () => {
     //loader animation
@@ -115,6 +116,8 @@ window.onload = () => {
     //
     //animate character select/title/etc
     //up from bottom 
+    //at end, set gameREady to true
+    gameReady = true;
 }
 
 //CHARACTER SELECT -----------------------------------------
@@ -134,24 +137,51 @@ prevCharButton.addEventListener("click", () => {
 //RUNNING/ETC ----------------------------------------------
 
 runButton.addEventListener("mousedown", () => {
-    //set running to true
-    //start run animation
+    if (gameReady == true) {
+        running = true;
+        console.log("Running:", running)
+        //set running to true, for later mouse-up stuff
+        //start run animation
+        //character.run
+        //background.scroll
+        //move character select left, 
+        //bring score in from right
+    }
 });
 
-const run = () => {
-    //on buttonpress run
-    //character.run
-    //background.scroll
-    //move character select left, 
-    //bring score in from right
-}
+window.addEventListener("mouseup", () => {
+    if (running == true) {
+        running = false;
+        gameReady = false;
+        console.log("Running:", running)
+        //character.fall, move offscreen
+        //reposition as next character, scroll in
+        //also scroll in character select, game title
+        //background.scroll to match
+    }
+})
 
-const fall = () => {
-    //on butten release run
-    //character.fall, move offscreen
-    //reposition as next character, scroll in
-    //also scroll in character select, game title
-    //background.scroll to match
-}
+//OTHER BUTTONS --------------------------------------------
 
+flailButton.addEventListener("click", () => {
+    //trigger flail animation
+    console.log("Flail");
+});
 
+cryButton.addEventListener("click", () => {
+    //trigger cry animation
+    //spawn tears that splash on ground
+    console.log("Cry");
+});
+
+eyesButton.addEventListener("click", () => {
+    //black out everything
+    //except eyes and an open eyes button
+    console.log("Eyes");
+});
+
+yellButton.addEventListener("click", () => {
+    //trigger yell animation
+    //spawn letters for yell
+    console.log("Yell");
+});
