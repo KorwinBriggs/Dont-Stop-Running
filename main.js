@@ -42,22 +42,91 @@ const bg = {
 
 //character pieces/animations
 const character = {
-    body: document.getElementById("character"),
-    head: document.getElementById("head"), 
-    torso: document.getElementById("torso"), 
-    hips: document.getElementById("hips"), 
-    bicepR: document.getElementById("bicep-right"), 
-    forearmR: document.getElementById("forearm-right"), 
-    bicepL: document.getElementById("bicep-left"), 
-    forearmL: document.getElementById("forearm-left"), 
-    thighR: document.getElementById("thigh-right"), 
-    shinR: document.getElementById("shin-right"), 
-    footR: document.getElementById("foot-right"), 
-    thighL: document.getElementById("thigh-left"), 
-    shinL: document.getElementById("shin-left"), 
-    footL: document.getElementById("foot-left"), 
 
-    test: () => {console.log("success")},
+    body: document.getElementById("character"), // for moving full character
+
+    //skeleton = blank divs arranged by joint, no images
+    skeleton: {
+        torso: document.getElementById("skeleton__torso"),
+        head: document.getElementById("skeleton__head"), 
+        eyes: document.getElementById("skeleton__eyes"), 
+        bicepR: document.getElementById("skeleton__bicep-right"), 
+        forearmR: document.getElementById("skeleton__forearm-right"), 
+        bicepL: document.getElementById("skeleton__bicep-left"), 
+        forearmL: document.getElementById("skeleton__forearm-left"), 
+        thighR: document.getElementById("skeleton__thigh-right"), 
+        shinR: document.getElementById("skeleton__shin-right"), 
+        footR: document.getElementById("skeleton__foot-right"), 
+        thighL: document.getElementById("skeleton__thigh-left"), 
+        shinL: document.getElementById("skeleton__shin-left"), 
+        footL: document.getElementById("skeleton__foot-left"), 
+    },
+
+    //image = images, arranged by depth from screen
+    //in order to overcome the vagueries of inheritance and z-axis.
+    image: {
+        torsoF: document.getElementById("graphic__torso-front"),
+        torsoB: document.getElementById("graphic__torso-back"),
+        head: document.getElementById("graphic__head"), 
+        eyes: document.getElementById("graphic__eyes"),
+        mouth: document.getElementById("graphic__mouth"),
+        bicepR: document.getElementById("graphic__bicep-right"), 
+        forearmR: document.getElementById("graphic__forearm-right"), 
+        bicepL: document.getElementById("graphic__bicep-left"), 
+        forearmL: document.getElementById("graphic__forearm-left"), 
+        thighR: document.getElementById("graphic__thigh-right"), 
+        shinR: document.getElementById("graphic__shin-right"), 
+        footR: document.getElementById("graphic__foot-right"), 
+        thighL: document.getElementById("graphic__thigh-left"), 
+        shinL: document.getElementById("graphic__shin-left"), 
+        footL: document.getElementById("graphic__foot-left"), 
+    },
+
+    matchBone: (image, bone) => {
+        //helper function, 
+        //check if image is in same location as bone
+        //if not, move to match
+        let boneStyle = getComputedStyle(bone);
+        let imageStyle = getComputedStyle(image);
+        if (imageStyle.transform != boneStyle.transform) image.style.transform = boneStyle.transform;
+        if (imageStyle.height != boneStyle.height) image.style.height = boneStyle.height;
+        if (imageStyle.width != boneStyle.width) image.style.width = boneStyle.width;
+
+        let boneTop = bone.getBoundingClientRect().top + window.scrollY + "px";
+        if (image.style.top != boneTop) image.style.top = boneTop;
+
+        let boneLeft = bone.getBoundingClientRect().left + window.scrollX + "px";
+        if (image.style.left != boneLeft) image.style.left = boneLeft;
+
+        //problem is that all the tops and lefts are relative to their parents, 
+        //which are often relative to their parents
+        //how to solve?
+        //simplify the image
+        //take graphics out of character; let them sit at root window
+        //then just move them to be
+    },
+
+    matchSkeleton: () => {
+        let image = character.image;
+        let skeleton = character.skeleton;
+        //match all images to all bones
+        character.matchBone(image.torsoF, skeleton.torso);
+        character.matchBone(image.torsoB, skeleton.torso);
+        character.matchBone(image.head, skeleton.head);
+        character.matchBone(image.mouth, skeleton.head);
+        character.matchBone(image.eyes, skeleton.eyes);
+        character.matchBone(image.bicepR, skeleton.bicepR);
+        character.matchBone(image.forearmR, skeleton.forearmR);
+        character.matchBone(image.bicepL, skeleton.bicepL);
+        character.matchBone(image.forearmL, skeleton.forearmL);
+        character.matchBone(image.thighR, skeleton.thighR);
+        character.matchBone(image.shinR, skeleton.shinR);
+        character.matchBone(image.footR, skeleton.footR);
+        character.matchBone(image.thighL, skeleton.thighL);
+        character.matchBone(image.shinL, skeleton.shinL);
+        character.matchBone(image.footL, skeleton.footL);
+        
+    },
 
     stand: () => {
         //animation for standing goes here
@@ -86,6 +155,9 @@ const character = {
         //but leave spawning tear particles to button function
     },
 }
+
+character.matchSkeleton();
+
 
 //word pieces and buttons
 const titleDisplay = document.getElementById("game-title");
@@ -123,13 +195,17 @@ window.onload = () => {
 //CHARACTER SELECT -----------------------------------------
 
 nextCharButton.addEventListener("click", () => {
-    //slide character off left, new character in from right
+    //slide character off left, 
+    //change class from ex man to woman
+    //new character in from right
     //slide background to match
     console.log("Next Character");
 })
 
 prevCharButton.addEventListener("click", () => {
-    //slide character off right, new character in from left
+    //slide character off right, 
+    //change class from ex man to woman
+    //new character in from left
     //slide background to match
     console.log("Previous Character");
 });

@@ -18,56 +18,90 @@ h1, h2, p {
 }
 
 main {
-    background-color: deepskyblue;
-    height: 66%;
+    position:relative;
+    background-color: transparent;
+    height: 100%;
     width: 100%;
-}
-
-#character-selection {
-    display: flex;
-    justify-content: center;
+    // overflow: hidden;
 }
 
 
-#controller {
-    display: grid;
-    grid-template-columns: 25% 50% 25%;
-    grid-template-rows: 42% 42% 1em;
-    background-color: tomato;
-    height: 34%;
-    width: 100%;
+/* BACKGROUND BITS */
+
+#action {
+    position: relative;
+    height:66%;
+    // overflow: hidden;
+
+    &>* {
+        position: absolute;
+        width:100%
+    }
 }
 
-.control {
-    background-color: sandybrown;
-}
+    .bg {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        // width: inherit;
+        background-repeat: repeat-x;
+        background-size: cover;
+        bottom:0;
+    }
 
-#control__flail {
-    grid-area: 1/1/2/2;
-}
+    .bg__layer0 {
+        background-image: url(img/bg/bg-scratches.png);
+    }
+    
+    .bg__layer1 {
+        background-image: url(img/bg/bg-trees-2.png);
+    }
+    
+    .bg__layer2 {
+        background-image: url(img/bg/bg-trees-1.png);
+    }
+    
+    .bg__layer3 {
+        background-image: url(img/bg/bg-grass.png);
+        height:20%;
+    }
 
-#control__eyes {
-    grid-area: 2/1/3/2;
-}
+    .paper-texture {
+        background-image: url(img/bg/paper-texture.png);
+    }
 
-#control__run {
-    grid-area: 1/2/3/3;
-}
 
-#control__yell {
-    grid-area: 1/3/2/4;
-}
 
-#control__cry {
-    grid-area: 2/3/3/4;
-}
 
-#control__footer {
-    grid-area: 3/1/4/4;
-}
+/* FOREGROUND BITS */
+
+    #top-words {
+        top: 5%;
+    }
+
+    #char-select-menu {
+        display: flex;
+        justify-content: center;
+        bottom: 3%;
+    }
+
+
 
 
 /* CHARACTER BITS */
+
+// #character {
+//     width:100%;
+//     height:100%;
+//     margin: auto;
+// }
+
+#character > * {
+    position: absolute;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
 
 /* using sass to automate background-image names*/
 $character-prefixes: "man", "woman";
@@ -76,9 +110,183 @@ $body-part-suffixes: "torso-front", "torso-back", "head", "eyes", "mouth", "bice
 @each $prefix in $character-prefixes {
     .#{$prefix} {
         @each $suffix in $body-part-suffixes {
-            .#{$suffix} {
-                background-image: $prefix + "-" + $suffix + ".png";
+            &.#{$suffix} {
+                background-image: url(img/#{$prefix}/#{$prefix} + "-" + $suffix + ".png");
+                background-size: 100%;
             }
         }
     }
+}
+
+// Default heights/widths, in percentages based on image-size, 
+// to keep everything positioned where it should be regardless 
+// of screen-size
+
+#skeleton { 
+    //change these values at cutoff points to support different devices
+    height:500px;
+    width:500px;
+    bottom:0%;
+    margin-left:50%;
+    left:-250px;
+}
+
+
+#skeleton * {
+    position: absolute;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#skeleton__ {
+
+    &torso {
+        width:35%;
+        height:35%;
+        bottom:35%;
+        left:32.5%;
+    }
+
+    &head {
+        height:61.5%;
+        width:80%;
+        bottom:80%;
+        left: 12%;
+    }
+
+    &eyes {
+        height:100%;
+        width:100%;
+    }
+
+    &bicep-right {
+        width: 45%;
+        height: 53.8%;
+        top:10.5%;
+        left:25%;
+    }
+
+    &forearm-right {
+        width: 100%;
+        height: 100%;
+        top:65%;
+        right:3%;
+    }
+
+    &bicep-left {
+        width: 45%;
+        height: 53.8%;
+        top:10.5%;
+        left:33%;
+    }
+
+    &forearm-left {
+        width: 100%;
+        height: 100%;
+        top:65%;
+        right:3%;
+    }
+
+    &thigh-right {
+        width: 45%;
+        height: 69.2%;
+        top:50%;
+        left:25%;
+    }
+
+    &shin-right {
+        width: 100%;
+        height: 100%;
+        top:68%;
+    }
+
+    &foot-right {
+        width: 60%;
+        height: 25.3%;
+        top:61%;
+        left:30%;
+    }
+
+    &thigh-left {
+        width: 45%;
+        height: 69.2%;
+        top:50%;
+        left:30%;
+    }
+
+    &shin-left {
+        width: 100%;
+        height: 100%;
+        top:68%;
+    }
+
+    &foot-left {
+        width: 60%;
+        height: 25.3%;
+        top:61%;
+        left:30%;
+    }
+
+}
+
+.graphic {
+    position: absolute;
+}
+
+/* BUTTONS AND CONTROLS */
+
+
+
+#controller {
+    position: relative;
+    display: grid;
+    grid-template-columns: 25% 50% 25%;
+    grid-template-rows: 42% 42% 1em;
+    background-image: url("img/controls/woodtexture.gif");
+    background-size: 40rem;
+    height: calc(34% - 40px);
+    border: 20px solid;
+    border-image: url("img/controls/brassborder.png") 65 repeat;
+
+    .control {
+        height: 100%;
+        background-color: transparent;
+        background-image: url("img/controls/buttons.png");
+        background-size: 400%;
+        border:none;
+    }
+
+    #control__flail {
+        grid-area: 1/1/2/2;
+    }
+
+    #control__eyes {
+        grid-area: 2/1/3/2;
+    }
+
+    #control__run {
+        grid-area: 1/2/3/3;
+    }
+
+    #control__cry {
+        grid-area: 2/3/3/4;
+    }
+
+    #control__centerdiv {
+        grid-area: 1/2/3/3;
+    }
+
+    #control__plaque {
+
+    }
+
+    #control__run {
+
+    }
+
+    #control__footer {
+        grid-area: 3/1/4/4;
+    }
+
 }
