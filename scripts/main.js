@@ -138,6 +138,7 @@ const character = {
         torso: document.getElementById("skeleton__torso"),
         head: document.getElementById("skeleton__head"), 
         eyes: document.getElementById("skeleton__eyes"), 
+        mouth: document.getElementById("skeleton__mouth"),
         bicepR: document.getElementById("skeleton__bicep-right"), 
         forearmR: document.getElementById("skeleton__forearm-right"), 
         bicepL: document.getElementById("skeleton__bicep-left"), 
@@ -170,14 +171,62 @@ const character = {
         footL: document.getElementById("graphic__foot-left"), 
     },
 
-    matchBone: (image, bone) => {
+    initialMatch: () => { //for repositioning character images on load, and after window resize
+        
+        let image = character.image;
+        let skeleton = character.skeleton;
+        
+        const match = (img, bone) => {
+            bone.style.transform = "rotate(0deg)"
+            img.style.transform = "rotate(0deg)"
+
+            img.style.left = bone.getBoundingClientRect().left;
+            img.style.top = bone.getBoundingClientRect().top;
+
+            img.style.height = bone.style.height;
+            img.style.width = bone.style.width
+        }
+
+        match(image.torsoF, skeleton.torso);
+        match(image.torsoB, skeleton.torso);
+        match(image.head, skeleton.head);
+        match(image.mouth, skeleton.mouth);
+        match(image.eyes, skeleton.eyes);
+        match(image.bicepR, skeleton.bicepR);
+        match(image.forearmR, skeleton.forearmR);
+        match(image.bicepL, skeleton.bicepL);
+        match(image.forearmL, skeleton.forearmL);
+        match(image.thighR, skeleton.thighR);
+        match(image.shinR, skeleton.shinR);
+        match(image.footR, skeleton.footR);
+        match(image.thighL, skeleton.thighL);
+        match(image.shinL, skeleton.shinL);
+        match(image.footL, skeleton.footL);
+        
+        // let boneStyle = getComputedStyle(bone);
+        // let imageStyle = getComputedStyle(image);   
+
+        // bone.style.transform = "rotate(0deg)"
+        // image.style.transform = "rotate(0deg)"
+
+        // image.style.left = bone.getBoundingClientRect().left + window.scrollX + "px";
+        // image.style.top = bone.getBoundingClientRect().top + window.scrollY + "px";
+    },
+
+    getBonePosition: (image, bone) => {
+
+        
         //helper function, 
         //check if image is in same location as bone
         //if not, move to match
         let boneStyle = getComputedStyle(bone);
         let imageStyle = getComputedStyle(image);
-        if (imageStyle.height != boneStyle.height) image.style.height = boneStyle.height;
-        if (imageStyle.width != boneStyle.width) image.style.width = boneStyle.width;
+        let height, width, rotation, top, left;
+
+        // if (imageStyle.height != boneStyle.height) image.style.height = boneStyle.height;
+        // if (imageStyle.width != boneStyle.width) image.style.width = boneStyle.width;
+        if (imageStyle.height != boneStyle.height) height = boneStyle.height;
+        if (imageStyle.width != boneStyle.width) width = boneStyle.width;
 
         const matrixToDeg = (matrix) => { //paraphrased from function found on the internet
             if(matrix !== 'none') {
@@ -206,19 +255,21 @@ const character = {
             return total;
         }
 
-        image.style.transform = "rotate(" + getCombinedRotation(bone) + "deg)";
-
-        image.style.left = bone.getBoundingClientRect().left + window.scrollX + "px";
-        image.style.top = bone.getBoundingClientRect().top + window.scrollY + "px";
+        // image.style.transform = "rotate(" + getCombinedRotation(bone) + "deg)";
+        rotation = "rotate(" + getCombinedRotation(bone) + "deg)";
 
         let boneRect = bone.getBoundingClientRect();
         let imageRect = image.getBoundingClientRect();
         let newLeft = boneRect.right + boneRect.left - imageRect.right;
         let newTop = boneRect.top + boneRect.bottom - imageRect.bottom;
 
-        image.style.left = newLeft + "px";
-        image.style.top = newTop + "px";
+        // image.style.left = newLeft + "px";
+        // image.style.top = newTop + "px";
+
+        left = newLeft + "px";
+        top = newTop + "px";
         
+        return [ height, width, rotation, top, left ];
         /* if i can match the centers of each, i can fix this
         x = bone, y = image
         xtop+xbottom/2 = ytop+ybottom/2   <-- matching centerpoints
@@ -228,25 +279,49 @@ const character = {
         */
     },
 
+    matchPosition(image, info) {
+        image.style.height = info[0];
+        image.style.width = info[1];
+        image.style.rotation = info[2];
+        image.style.top = info[3];
+        image.style.left = info[4];
+    },
+
     matchSkeleton: () => {
         let image = character.image;
         let skeleton = character.skeleton;
-        //match all images to all bones
-        character.matchBone(image.torsoF, skeleton.torso);
-        character.matchBone(image.torsoB, skeleton.torso);
-        character.matchBone(image.head, skeleton.head);
-        character.matchBone(image.mouth, skeleton.head);
-        character.matchBone(image.eyes, skeleton.eyes);
-        character.matchBone(image.bicepR, skeleton.bicepR);
-        character.matchBone(image.forearmR, skeleton.forearmR);
-        character.matchBone(image.bicepL, skeleton.bicepL);
-        character.matchBone(image.forearmL, skeleton.forearmL);
-        character.matchBone(image.thighR, skeleton.thighR);
-        character.matchBone(image.shinR, skeleton.shinR);
-        character.matchBone(image.footR, skeleton.footR);
-        character.matchBone(image.thighL, skeleton.thighL);
-        character.matchBone(image.shinL, skeleton.shinL);
-        character.matchBone(image.footL, skeleton.footL);
+
+        //first collect info on each bone position
+        let posTorso = character.getBonePosition(image.torsoF, skeleton.torso);
+        let posHead = character.getBonePosition(image.head, skeleton.head);
+        let posEyes = character.getBonePosition(image.eyes, skeleton.eyes);
+        let posMouth = character.getBonePosition(image.mouth, skeleton.mouth);
+        let posBicepR = character.getBonePosition(image.bicepR, skeleton.bicepR);
+        let posForearmR = character.getBonePosition(image.forearmR, skeleton.forearmR);
+        let posBicepL = character.getBonePosition(image.bicepL, skeleton.bicepL);
+        let posForearmL = character.getBonePosition(image.forearmL, skeleton.forearmL);
+        let posThighR = character.getBonePosition(image.thighR, skeleton.thighR);
+        let posShinR = character.getBonePosition(image.shinR, skeleton.shinR);
+        let posFootR = character.getBonePosition(image.footR, skeleton.footR);
+        let posThighL = character.getBonePosition(image.thighL, skeleton.thighL);
+        let posShinL = character.getBonePosition(image.shinL, skeleton.shinL);
+        let posFootL = character.getBonePosition(image.footL, skeleton.footL);
+        //then match images to that info
+        character.matchPosition(image.torsoF, posTorso);
+        character.matchPosition(image.torsoB, posTorso);
+        character.matchPosition(image.head, posHead);
+        character.matchPosition(image.mouth, posMouth);
+        character.matchPosition(image.eyes, posEyes);
+        character.matchPosition(image.bicepR, posBicepR);
+        character.matchPosition(image.forearmR, posForearmR);
+        character.matchPosition(image.bicepL, posBicepL);
+        character.matchPosition(image.forearmL, posForearmL);
+        character.matchPosition(image.thighR, posThighR);
+        character.matchPosition(image.shinR, posShinR);
+        character.matchPosition(image.footR, posFootR);
+        character.matchPosition(image.thighL, posThighL);
+        character.matchPosition(image.shinL, posShinL);
+        character.matchPosition(image.footL, posFootL);
         
     },
 
@@ -261,7 +336,7 @@ const character = {
     stand: (speed) => {
         //animation for standing goes here
         //should be built of several modular parts: legs, torso, etc on a half-second timeframe
-        let {torso, head, eyes, bicepR, bicepL, forearmR, forearmL, thighL, thighR, shinL, shinR, footL, footR} = character.skeleton;
+        let {torso, head, eyes, mouth, bicepR, bicepL, forearmR, forearmL, thighL, thighR, shinL, shinR, footL, footR} = character.skeleton;
         let ease = "power1.inOut"
 
         let stand = gsap.timeline( {repeat: 0} ); 
@@ -373,6 +448,7 @@ const cryButton = document.getElementById("control__cry");
 
 bg.getPositions();
 bg.getWidths();
+character.initialMatch();
 character.matchSkeleton(); //setup stuff
 
 let running = false; //for tracking mouseUps that might be outside button 
@@ -393,7 +469,10 @@ window.onload = () => {
     gameReady = true;
 }
 
-//CHARACTER SELECT -----------------------------------------
+
+//BUTTONS --------------------------------------------------
+
+//CHARACTER SELECT
 
 nextCharButton.addEventListener("click", () => {
     //slide character off left, 
@@ -411,7 +490,7 @@ prevCharButton.addEventListener("click", () => {
     console.log("Previous Character");
 });
 
-//RUNNING/ETC ----------------------------------------------
+//RUNNING/ETC 
 
 runButton.addEventListener("mousedown", () => {
     if (gameReady == true) {
@@ -438,7 +517,7 @@ window.addEventListener("mouseup", () => {
     }
 })
 
-//OTHER BUTTONS --------------------------------------------
+//OTHER BUTTONS 
 
 flailButton.addEventListener("click", () => {
     //trigger flail animation
