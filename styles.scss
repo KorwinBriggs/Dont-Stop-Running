@@ -46,22 +46,23 @@ main {
         // width: inherit;
         background-repeat: repeat-x;
         background-size: cover;
+        background-position: 0px 0px;
         bottom:0;
     }
 
-    .bg__layer0 {
+    #bg__layer0 {
         background-image: url(img/bg/bg-scratches.png);
     }
     
-    .bg__layer1 {
+    #bg__layer1 {
         background-image: url(img/bg/bg-trees-2.png);
     }
     
-    .bg__layer2 {
+    #bg__layer2 {
         background-image: url(img/bg/bg-trees-1.png);
     }
     
-    .bg__layer3 {
+    #bg__layer3 {
         background-image: url(img/bg/bg-grass.png);
         height:20%;
     }
@@ -101,6 +102,7 @@ main {
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
+
 }
 
 /* using sass to automate background-image names*/
@@ -137,6 +139,8 @@ $body-part-suffixes: "torso-front", "torso-back", "head", "eyes", "mouth", "bice
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
+
+    border: 1px red solid;
 }
 
 #skeleton__ {
@@ -153,18 +157,22 @@ $body-part-suffixes: "torso-front", "torso-back", "head", "eyes", "mouth", "bice
         width:80%;
         bottom:80%;
         left: 12%;
+        transform-origin: 55% 80%;
     }
 
     &eyes {
         height:100%;
         width:100%;
+        left:0;
+        top:0;
     }
 
     &bicep-right {
         width: 45%;
         height: 53.8%;
         top:10.5%;
-        left:25%;
+        left:20%;
+        transform-origin: 50% 20%;
     }
 
     &forearm-right {
@@ -172,13 +180,15 @@ $body-part-suffixes: "torso-front", "torso-back", "head", "eyes", "mouth", "bice
         height: 100%;
         top:65%;
         right:3%;
+        transform-origin: 50% 18%;
     }
 
     &bicep-left {
         width: 45%;
         height: 53.8%;
         top:10.5%;
-        left:33%;
+        left:38%;
+        transform-origin: 50% 20%;
     }
 
     &forearm-left {
@@ -186,46 +196,55 @@ $body-part-suffixes: "torso-front", "torso-back", "head", "eyes", "mouth", "bice
         height: 100%;
         top:65%;
         right:3%;
+        transform-origin: 50% 18%;
     }
 
     &thigh-right {
         width: 45%;
         height: 69.2%;
         top:50%;
-        left:25%;
+        left:23%;
+        transform-origin: 55% 20%;
     }
 
     &shin-right {
         width: 100%;
         height: 100%;
+        right:.1%;
         top:68%;
+        transform-origin: 53% 21%;
     }
 
     &foot-right {
-        width: 60%;
-        height: 25.3%;
-        top:61%;
-        left:30%;
+        width: 70%;
+        height: 30%;
+        top:58%;
+        left:28%;
+        transform-origin: 30% 50%;
     }
 
     &thigh-left {
         width: 45%;
         height: 69.2%;
         top:50%;
-        left:30%;
+        left:29%;
+        transform-origin: 55% 20%;
     }
 
     &shin-left {
         width: 100%;
         height: 100%;
+        right:.1%;
         top:68%;
+        transform-origin: 53% 21%;
     }
 
     &foot-left {
-        width: 60%;
-        height: 25.3%;
-        top:61%;
-        left:30%;
+        width: 70%;
+        height: 30%;
+        top:58%;
+        left:28%;
+        transform-origin: 30% 50%;
     }
 
 }
@@ -252,13 +271,16 @@ $body-part-suffixes: "torso-front", "torso-back", "head", "eyes", "mouth", "bice
     .control {
         height: 100%;
         background-color: transparent;
-        background-image: url("img/controls/buttons.png");
-        background-size: 400%;
         border:none;
+    }
+
+    .smallbutton {
+        background-size: cover;
     }
 
     #control__flail {
         grid-area: 1/1/2/2;
+        background-image: url("img/controls/button-flail.png");
     }
 
     #control__eyes {
@@ -278,11 +300,13 @@ $body-part-suffixes: "torso-front", "torso-back", "head", "eyes", "mouth", "bice
     }
 
     #control__plaque {
-
+        width:100%;
+        height:30%;
     }
 
     #control__run {
-
+        width:100%;
+        height:70%;
     }
 
     #control__footer {

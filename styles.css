@@ -38,22 +38,23 @@ main {
   width: 100%;
   background-repeat: repeat-x;
   background-size: cover;
+  background-position: 0px 0px;
   bottom: 0;
 }
 
-.bg__layer0 {
+#bg__layer0 {
   background-image: url(img/bg/bg-scratches.png);
 }
 
-.bg__layer1 {
+#bg__layer1 {
   background-image: url(img/bg/bg-trees-2.png);
 }
 
-.bg__layer2 {
+#bg__layer2 {
   background-image: url(img/bg/bg-trees-1.png);
 }
 
-.bg__layer3 {
+#bg__layer3 {
   background-image: url(img/bg/bg-grass.png);
   height: 20%;
 }
@@ -185,6 +186,7 @@ main {
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
+  border: 1px red solid;
 }
 
 #skeleton__torso {
@@ -198,68 +200,83 @@ main {
   width: 80%;
   bottom: 80%;
   left: 12%;
+  transform-origin: 55% 80%;
 }
 #skeleton__eyes {
   height: 100%;
   width: 100%;
+  left: 0;
+  top: 0;
 }
 #skeleton__bicep-right {
   width: 45%;
   height: 53.8%;
   top: 10.5%;
-  left: 25%;
+  left: 20%;
+  transform-origin: 50% 20%;
 }
 #skeleton__forearm-right {
   width: 100%;
   height: 100%;
   top: 65%;
   right: 3%;
+  transform-origin: 50% 18%;
 }
 #skeleton__bicep-left {
   width: 45%;
   height: 53.8%;
   top: 10.5%;
-  left: 33%;
+  left: 38%;
+  transform-origin: 50% 20%;
 }
 #skeleton__forearm-left {
   width: 100%;
   height: 100%;
   top: 65%;
   right: 3%;
+  transform-origin: 50% 18%;
 }
 #skeleton__thigh-right {
   width: 45%;
   height: 69.2%;
   top: 50%;
-  left: 25%;
+  left: 23%;
+  transform-origin: 55% 20%;
 }
 #skeleton__shin-right {
   width: 100%;
   height: 100%;
+  right: 0.1%;
   top: 68%;
+  transform-origin: 53% 21%;
 }
 #skeleton__foot-right {
-  width: 60%;
-  height: 25.3%;
-  top: 61%;
-  left: 30%;
+  width: 70%;
+  height: 30%;
+  top: 58%;
+  left: 28%;
+  transform-origin: 30% 50%;
 }
 #skeleton__thigh-left {
   width: 45%;
   height: 69.2%;
   top: 50%;
-  left: 30%;
+  left: 29%;
+  transform-origin: 55% 20%;
 }
 #skeleton__shin-left {
   width: 100%;
   height: 100%;
+  right: 0.1%;
   top: 68%;
+  transform-origin: 53% 21%;
 }
 #skeleton__foot-left {
-  width: 60%;
-  height: 25.3%;
-  top: 61%;
-  left: 30%;
+  width: 70%;
+  height: 30%;
+  top: 58%;
+  left: 28%;
+  transform-origin: 30% 50%;
 }
 
 .graphic {
@@ -281,12 +298,14 @@ main {
 #controller .control {
   height: 100%;
   background-color: transparent;
-  background-image: url("img/controls/buttons.png");
-  background-size: 400%;
   border: none;
+}
+#controller .smallbutton {
+  background-size: cover;
 }
 #controller #control__flail {
   grid-area: 1/1/2/2;
+  background-image: url("img/controls/button-flail.png");
 }
 #controller #control__eyes {
   grid-area: 2/1/3/2;
@@ -299,6 +318,14 @@ main {
 }
 #controller #control__centerdiv {
   grid-area: 1/2/3/3;
+}
+#controller #control__plaque {
+  width: 100%;
+  height: 30%;
+}
+#controller #control__run {
+  width: 100%;
+  height: 70%;
 }
 #controller #control__footer {
   grid-area: 3/1/4/4;
