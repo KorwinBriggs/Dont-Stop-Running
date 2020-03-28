@@ -97,7 +97,7 @@ main {
 //     margin: auto;
 // }
 
-#character > * {
+#character * {
     position: absolute;
     background-size: contain;
     background-position: center;
@@ -124,7 +124,7 @@ $body-part-suffixes: "torso-front", "torso-back", "head", "eyes", "mouth", "bice
 // to keep everything positioned where it should be regardless 
 // of screen-size
 
-#skeleton { 
+#skeleton, #character { 
     //change these values at cutoff points to support different devices
     height:500px;
     width:500px;
@@ -157,7 +157,7 @@ $body-part-suffixes: "torso-front", "torso-back", "head", "eyes", "mouth", "bice
         width:80%;
         bottom:80%;
         left: 12%;
-        transform-origin: 55% 80%;
+        // transform-origin: 55% 80%;
     }
 
     &eyes {

@@ -75,7 +75,7 @@ main {
 }
 
 /* CHARACTER BITS */
-#character > * {
+#character * {
   position: absolute;
   background-size: contain;
   background-position: center;
@@ -173,7 +173,7 @@ main {
   background-size: 100%;
 }
 
-#skeleton {
+#skeleton, #character {
   height: 500px;
   width: 500px;
   bottom: 0%;
@@ -200,7 +200,6 @@ main {
   width: 80%;
   bottom: 80%;
   left: 12%;
-  transform-origin: 55% 80%;
 }
 #skeleton__eyes {
   height: 100%;

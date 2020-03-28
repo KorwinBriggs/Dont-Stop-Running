@@ -131,10 +131,10 @@ const bg = {
 //character pieces/animations
 const character = {
 
-    body: document.getElementById("character"), // for moving full character
 
     //skeleton = blank divs arranged by joint, no images
     skeleton: {
+        all: document.getElementById("skeleton"),
         torso: document.getElementById("skeleton__torso"),
         head: document.getElementById("skeleton__head"), 
         eyes: document.getElementById("skeleton__eyes"), 
@@ -153,6 +153,7 @@ const character = {
     //image = images, arranged by depth from screen
     //in order to overcome the vagueries of inheritance and z-axis.
     image: {
+        all: document.getElementById("character"),
         torsoF: document.getElementById("graphic__torso-front"),
         torsoB: document.getElementById("graphic__torso-back"),
         head: document.getElementById("graphic__head"), 
@@ -184,7 +185,7 @@ const character = {
                 var values = matrix.split('(')[1].split(')')[0].split(',');
                 var a = values[0];
                 var b = values[1];
-                var angle = Math.round(Math.atan2(b, a) * (180/Math.PI));
+                var angle = Math.atan2(b, a) ;
             } else { var angle = 0; }
             return angle;
         }
@@ -195,37 +196,38 @@ const character = {
             return angle;
         }
 
+        const radToDeg = (radians) => {
+            return radians * (180/Math.PI)
+        }
+
         const getCombinedTop = (bone) => {
-            // let dimension = 0;
-            // if (boneStyle[propertyName] !== "undefined") {
-                let total = 0
-                if(boneStyle.top) total += parseInt(boneStyle.top, 10);
-                if(boneStyle.bottom) total -= parseInt(boneStyle.bottom, 10);
-                if(bone.parentNode.id != "action") total = total + getCombinedTop(bone.parentNode);
-            // }
+            let total = 0;
+            total += parseFloat(getComputedStyle(bone).top);
+            if(bone.parentNode.id != "action") total = total + getCombinedTop(bone.parentNode);
             return total;
         }
 
-        image.style.transform = "rotate(" + getCombinedRotation(bone) + "deg)";
+        const getCombinedLeft = (bone) => {
+            let total = 0;
+            total += parseFloat(getComputedStyle(bone).left);
+            if(bone.parentNode.id != "action") total = total + getCombinedLeft(bone.parentNode);
+            // total += getComputedStyle(character.skeleton.all).width/2
+            return total;
+        }
 
-        image.style.left = bone.getBoundingClientRect().left + window.scrollX + "px";
-        image.style.top = bone.getBoundingClientRect().top + window.scrollY + "px";
 
-        let boneRect = bone.getBoundingClientRect();
-        let imageRect = image.getBoundingClientRect();
-        let newLeft = boneRect.right + boneRect.left - imageRect.right;
-        let newTop = boneRect.top + boneRect.bottom - imageRect.bottom;
+        // let currentRotation = getCombinedRotation(bone);
+        image.style.transform = "rotate(" + radToDeg(getCombinedRotation(bone)) + "deg)";
 
-        image.style.left = newLeft + "px";
-        image.style.top = newTop + "px";
-        
-        /* if i can match the centers of each, i can fix this
-        x = bone, y = image
-        xtop+xbottom/2 = ytop+ybottom/2   <-- matching centerpoints
-        xtop+xbottom = ytop+ybottom
-        xtop+xbottom-ybottom = ytop  <-- solving for top
-        xtop+xbottom-ytop = ybottom
-        */
+        // const getOffsetY = (width, height, rotation) => {
+        //     let angle = Math.tan(width/height);
+        //     let trigOffset = (1-Math.sin(angle)) * (width/Math.sin(angle));
+        //     let sidesOffset = (height-width) / 2
+        //     return currentDifference;
+        // }
+
+        image.style.top = getCombinedTop(bone) + 'px';
+        image.style.left = getCombinedLeft(bone) + 'px';
     },
 
     matchSkeleton: () => {
@@ -464,8 +466,8 @@ yellButton.addEventListener("click", () => {
 });
 
 
-// let tl = gsap.timeline( {repeat:-1});
-// tl.to(character.skeleton.footR, {rotation:360, ease: "none", duration:4})
-setInterval(function() {character.matchSkeleton()}, 5)
-character.stand(.75);
+let tl = gsap.timeline( {repeat:-1});
+tl.to(character.skeleton.torso, {rotation:360, ease: "none", duration:10})
+setInterval(function() {character.matchSkeleton()}, 40)
+// character.stand(.75);
 
