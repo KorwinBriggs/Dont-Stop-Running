@@ -37,62 +37,59 @@
 				</div>
 			</div>
 
-			<div id="skeleton">
-				<!-- Character pieces nested by joint for more intuitive animation -->
-				<div id="skeleton__torso" class="torso skeleton">
-					<div id="skeleton__head" class="head skeleton">
-						<div id="skeleton__eyes" class="eyes skeleton"></div>
-						<div id="skeleton__mouth" class="mouth skeleton"></div>
-					</div>
-					<div id="skeleton__bicep-right" class="bicep skeleton">
-						<div id="skeleton__forearm-right" class="forearm skeleton"></div>
-					</div>
-					<div id="skeleton__bicep-left" class="bicep skeleton">
-						<div id="skeleton__forearm-left" class="forearm skeleton"></div>
-					</div>
-					<div id="skeleton__thigh-right" class="thigh skeleton">
-						<div id="skeleton__shin-right" class="shin skeleton">
-							<div id="skeleton__foot-right" class="foot skeleton"></div>
+			<!-- Character is built of bone divs with image divs inside, arranged to keep
+			the things that need to be in back behind those that need to be in front -->
+			<div id="character">
+				<div class="torso bone">
+
+					<div class="bicep bicep-left bone">
+						<div class="bicep bicep-left image man"></div>
+						<div class="forearm forearm-left bone">
+							<div class="forearm forearm-left image man"></div>
 						</div>
 					</div>
-					<div id="skeleton__thigh-left" class="thigh skeleton">
-						<div id="skeleton__shin-left" class="shin skeleton">
-							<div id="skeleton__foot-left" class="foot skeleton"></div>
+
+					<div class="torso torso-back image man"></div>
+
+					<div class="thigh thigh-left bone">
+						<div class="shin shin-left bone">
+							<div class="shin shin-left image man"></div>
+							<div class="foot foot-left bone">
+								<div class="foot foot-left image man"></div>
+							</div>
+						</div>
+						<div class="thigh thigh-left image man"></div>
+					</div>
+
+					<div class="thigh thigh-right bone">
+						<div class="shin shin-right bone">
+							<div class="shin shin-right image man"></div>
+							<div class="foot foot-right bone">
+								<div class="foot foot-right image man"></div>
+							</div>
+						</div>
+						<div class="thigh thigh-right image man"></div>
+					</div>
+
+					<div class="torso torso-front image man"></div>
+
+					<div class="head bone">
+						<div class="head image man"></div>
+						<div class="eyes bone">
+							<div class="eyes image man"></div>
+						</div>
+						<div class="mouth bone">
+							<div class="mouth image man"></div>
+						</div>
+					</div>
+
+					<div class="bicep bicep-right bone">
+						<div class="bicep bicep-right image man"></div>
+						<div class="forearm forearm-right bone">
+							<div class="forearm forearm-right image man"></div>
 						</div>
 					</div>
 				</div>
-				
-			</div>
-
-			<div id="character">
-					<!-- Character pieces in z-order, back to front; 
-					These have the actual graphics, and move/style
-					to match pieces in the skeleton -->
-
-				
-				<div id="graphic__bicep-left" class="graphic man bicep"></div>
-				<div id="graphic__forearm-left" class="graphic man forearm-front"></div>
-		
-				<div id="graphic__torso-back" class="graphic man torso-back"></div>
-			
-				<div id="graphic__shin-left" class="graphic man shin"></div>
-				<div id="graphic__foot-left" class="graphic man foot"></div>
-				<div id="graphic__thigh-left" class="graphic man thigh"></div>
-			
-
-				<div id="graphic__shin-right" class="graphic man shin"></div>
-				<div id="graphic__foot-right" class="graphic man foot"></div>					
-				<div id="graphic__thigh-right" class="graphic man thigh"></div>
-			
-				<div id="graphic__torso-front" class="graphic man torso-front"></div>
-			
-				<div id="graphic__head" class="graphic man head"></div>
-				<div id="graphic__mouth" class="graphic man mouth"></div>
-				<div id="graphic__eyes" class="graphic man eyes"></div>
-			
-				<div id="graphic__bicep-right" class="graphic man bicep"></div>
-				<div id="graphic__forearm-right" class="graphic man forearm-back"></div>
-			
 			</div>
 				
 			<div id="char-select-menu">
@@ -103,7 +100,6 @@
 
 
 		</div>
-
 
 
 		<div id="controller">

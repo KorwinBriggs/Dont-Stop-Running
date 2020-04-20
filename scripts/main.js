@@ -23,6 +23,7 @@ hitting RUN!! should
 */
 "use strict"
 
+
 //CONST's ---------------------------------
 
 //background pieces
@@ -30,23 +31,19 @@ const bg = {
     all: document.getElementsByClassName("bg"),
 
     layer0: document.getElementById("bg__layer0"),
-    layer0X: 0,
     layer0ratio: 1597/1108,
 
     layer1: document.getElementById("bg__layer1"),
-    layer1X: 0,
     layer1ratio: 7670/2216,
 
     layer2: document.getElementById("bg__layer2"),
-    layer2X: 0,
     layer2ratio: 7670/2216,
 
     layer3: document.getElementById("bg__layer3"),
-    layer3X: 0,
     layer3ratio: 3329/321,
 
-
-    getWidths: () => { //to be called on resizing the window
+    getWidths: () => { //gets background image widths based on heights, 
+                       //to be called on on load and on resizing the window
         bg.layer0height = getComputedStyle(bg.layer0).height.slice(0,-2);
         bg.layer0width = bg.layer0height * bg.layer0ratio;
         bg.layer1height = getComputedStyle(bg.layer1).height.slice(0,-2);
@@ -57,199 +54,81 @@ const bg = {
         bg.layer3width = bg.layer3height * bg.layer3ratio;
     },
 
-
-    getPositions: () => {
-        let widths = [bg.layer0width, bg.layer1width, bg.layer2width, bg.layer3width]
-
-        let positions = [
-            getComputedStyle(bg.layer0).backgroundPositionX.slice(0,-2),
-            getComputedStyle(bg.layer1).backgroundPositionX.slice(0,-2),
-            getComputedStyle(bg.layer2).backgroundPositionX.slice(0,-2),
-            getComputedStyle(bg.layer3).backgroundPositionX.slice(0,-2)
-        ]
-
-        for (let i = 0; i < 4; i++) {  //resetting positions closer to zero if they're many multiples of their widths
-            if ( positions[i] > widths[i] || positions[i] < -(widths[i]) ) {
-                positions[i] = positions[i] % widths[i];
-            }
-        }
-
-        bg.layer0X = positions[0];
-        bg.layer1X = positions[1];
-        bg.layer2X = positions[2];
-        bg.layer3X = positions[3];
-
-        bg.layer0.style.backgroundPositionX = positions[0] + "px";
-        bg.layer1.style.backgroundPositionX = positions[1] + "px";
-        bg.layer2.style.backgroundPositionX = positions[2] + "px";
-        bg.layer3.style.backgroundPositionX = positions[3] + "px";
-    },
-
-
-    scroll: (tl, ease, fraction) => {
-        //should get current x's, advance background relative to them for distance and duraction of fraction
-        tl.to(bg.layer0, {backgroundPositionX: (-(bg.layer0width) + bg.layer0X) * fraction + "px", ease: ease, duration: (10 * fraction), })
-        .to(bg.layer1, {backgroundPositionX: (-(bg.layer1width) + bg.layer1X) * fraction + "px", ease: ease, duration: (10 * fraction)}, '-=' + (10 * fraction) )
-        .to(bg.layer2, {backgroundPositionX: (-(bg.layer2width*2) + bg.layer2X) * fraction + "px", ease: ease, duration: (10 * fraction)}, '-=' + (10 * fraction) )
-        .to(bg.layer3, {backgroundPositionX: (-(bg.layer3width*5) + bg.layer3X) * fraction + "px", ease: ease, duration: (10 * fraction)}, '-=' + (10 * fraction) );
-    },
-
-    scrollStart: (tl) => { 
-        if (tl) {
-            tl.start();
-            return tl;
-        } else {
-            let tl = gsap.timeline({repeat:-1});
-            bg.scroll(tl, "none", 1)
-            return tl;
+    preventOverflow: () => { //used to reset position closer to 0, without visible changes, to prevent
+                            //javascript from sending some weird e-notation numbers
+        let layers = [bg.layer0, bg.layer1, bg.layer2, bg.layer3];
+        let widths = [bg.layer0width, bg.layer1width, bg.layer2width, bg.layer3width];
+        for (let i = 0; i < 4; i++) {
+            layers[i].style.backgroundPositionX = (parseFloat(layers[i].style.backgroundPositionX) % widths[i]) + 'px';
         }
     },
 
-    //new idea:
-    //just start the animation, and pause it immediately
-    //then either run, pause, or rewind it as necessary throughout app
+    scroll: (ease, distance, duration) => {
+        //tl is a timeline, ease is ease, distance is percent of one full loop, duration is seconds
+        let tl = gsap.timeline();
+        tl.to(bg.layer0, {backgroundPositionX: ("-=" + ((bg.layer0width) / 100) * distance + "px"), ease: ease, duration: duration })
+        .to(bg.layer1, {backgroundPositionX: ("-=" + ((bg.layer1width) / 100) * distance + "px"), ease: ease, duration: duration }, '-=' + duration )
+        .to(bg.layer2, {backgroundPositionX: ("-=" + ((bg.layer2width*2) / 100) * distance + "px"), ease: ease, duration: duration }, '-=' + duration )
+        .to(bg.layer3, {backgroundPositionX: ("-=" + ((bg.layer3width*6) / 100) * distance + "px"), ease: ease, duration: duration }, '-=' + duration )
+        // .call(bg.preventOverflow, []);
+        return tl;
+    },
 
-    /*
-        So, I can have the background running
-        then on stopbackground, get its current bg-location, and start a new
-        partial animation that moves it only a little bit forward, stopping with an ease
-        and then record the new bglocation for use in starting again
-    */
+    stop: () => { //kills all tweens on character parts
+        let parts = Object.values(character.skeleton);
+        for (let part of [bg.layer0, bg.layer1, bg.layer2, bg.layer3]) {
+            gsap.killTweensOf(part);
+        }
+    },
 
-    scrollStop: (tl) => {
-
-        tl.kill();
-        bg.getPositions();
-        let tl2 = gsap.timeline({repeat:1});
-        bg.scroll(tl2, "sine.out", .5)
-        return tl2;
-
-    }
 }
 
 
 //character pieces/animations
 const character = {
 
-
-    //skeleton = blank divs arranged by joint, no images
     skeleton: {
-        all: document.getElementById("skeleton"),
-        torso: document.getElementById("skeleton__torso"),
-        head: document.getElementById("skeleton__head"), 
-        eyes: document.getElementById("skeleton__eyes"), 
-        bicepR: document.getElementById("skeleton__bicep-right"), 
-        forearmR: document.getElementById("skeleton__forearm-right"), 
-        bicepL: document.getElementById("skeleton__bicep-left"), 
-        forearmL: document.getElementById("skeleton__forearm-left"), 
-        thighR: document.getElementById("skeleton__thigh-right"), 
-        shinR: document.getElementById("skeleton__shin-right"), 
-        footR: document.getElementById("skeleton__foot-right"), 
-        thighL: document.getElementById("skeleton__thigh-left"), 
-        shinL: document.getElementById("skeleton__shin-left"), 
-        footL: document.getElementById("skeleton__foot-left"), 
-    },
-
-    //image = images, arranged by depth from screen
-    //in order to overcome the vagueries of inheritance and z-axis.
-    image: {
         all: document.getElementById("character"),
-        torsoF: document.getElementById("graphic__torso-front"),
-        torsoB: document.getElementById("graphic__torso-back"),
-        head: document.getElementById("graphic__head"), 
-        eyes: document.getElementById("graphic__eyes"),
-        mouth: document.getElementById("graphic__mouth"),
-        bicepR: document.getElementById("graphic__bicep-right"), 
-        forearmR: document.getElementById("graphic__forearm-right"), 
-        bicepL: document.getElementById("graphic__bicep-left"), 
-        forearmL: document.getElementById("graphic__forearm-left"), 
-        thighR: document.getElementById("graphic__thigh-right"), 
-        shinR: document.getElementById("graphic__shin-right"), 
-        footR: document.getElementById("graphic__foot-right"), 
-        thighL: document.getElementById("graphic__thigh-left"), 
-        shinL: document.getElementById("graphic__shin-left"), 
-        footL: document.getElementById("graphic__foot-left"), 
+        torso: document.querySelectorAll(".bone.torso")[0],
+        head:  document.querySelectorAll(".bone.head")[0],
+        eyes:  document.querySelectorAll(".bone.eyes")[0],
+        mouth:  document.querySelectorAll(".bone.mouth")[0],
+        bicepR:  document.querySelectorAll(".bone.bicep-right")[0],
+        forearmR:  document.querySelectorAll(".bone.forearm-right")[0],
+        bicepL:  document.querySelectorAll(".bone.bicep-left")[0],
+        forearmL: document.querySelectorAll(".bone.forearm-left")[0],
+        thighR: document.querySelectorAll(".bone.thigh-right")[0],
+        shinR: document.querySelectorAll(".bone.shin-right")[0],
+        footR: document.querySelectorAll(".bone.foot-right")[0],
+        thighL: document.querySelectorAll(".bone.thigh-left")[0],
+        shinL: document.querySelectorAll(".bone.shin-left")[0],
+        footL: document.querySelectorAll(".bone.foot-left")[0],
     },
 
-    matchBone: (image, bone) => {
-        //helper function, 
-        //check if image is in same location as bone
-        //if not, move to match
-        let boneStyle = getComputedStyle(bone);
-        let imageStyle = getComputedStyle(image);
-        if (imageStyle.height != boneStyle.height) image.style.height = boneStyle.height;
-        if (imageStyle.width != boneStyle.width) image.style.width = boneStyle.width;
-
-        const matrixToDeg = (matrix) => { //paraphrased from function found on the internet
-            if(matrix !== 'none') {
-                var values = matrix.split('(')[1].split(')')[0].split(',');
-                var a = values[0];
-                var b = values[1];
-                var angle = Math.atan2(b, a) ;
-            } else { var angle = 0; }
-            return angle;
-        }
-
-        const getCombinedRotation = (bone) => {
-            let angle = matrixToDeg(getComputedStyle(bone).transform);
-            if(bone.parentNode.id != "action") angle = angle + getCombinedRotation(bone.parentNode);
-            return angle;
-        }
-
-        const radToDeg = (radians) => {
-            return radians * (180/Math.PI)
-        }
-
-        const getCombinedTop = (bone) => {
-            let total = 0;
-            total += parseFloat(getComputedStyle(bone).top);
-            if(bone.parentNode.id != "action") total = total + getCombinedTop(bone.parentNode);
-            return total;
-        }
-
-        const getCombinedLeft = (bone) => {
-            let total = 0;
-            total += parseFloat(getComputedStyle(bone).left);
-            if(bone.parentNode.id != "action") total = total + getCombinedLeft(bone.parentNode);
-            // total += getComputedStyle(character.skeleton.all).width/2
-            return total;
-        }
-
-
-        // let currentRotation = getCombinedRotation(bone);
-        image.style.transform = "rotate(" + radToDeg(getCombinedRotation(bone)) + "deg)";
-
-        // const getOffsetY = (width, height, rotation) => {
-        //     let angle = Math.tan(width/height);
-        //     let trigOffset = (1-Math.sin(angle)) * (width/Math.sin(angle));
-        //     let sidesOffset = (height-width) / 2
-        //     return currentDifference;
-        // }
-
-        image.style.top = getCombinedTop(bone) + 'px';
-        image.style.left = getCombinedLeft(bone) + 'px';
+    image: {
+        torsoF: document.querySelectorAll(".image.torso-front")[0],
+        torsoB: document.querySelectorAll(".image.torso-back")[0],
+        head:  document.querySelectorAll(".image.head")[0],
+        eyes:  document.querySelectorAll(".image.eyes")[0],
+        mouth:  document.querySelectorAll(".image.mouth")[0],
+        bicepR:  document.querySelectorAll(".image.bicep-right")[0],
+        forearmR:  document.querySelectorAll(".image.forearm-right")[0],
+        bicepL:  document.querySelectorAll(".image.bicep-left")[0],
+        forearmL: document.querySelectorAll(".image.forearm-left")[0],
+        thighR: document.querySelectorAll(".image.thigh-right")[0],
+        shinR: document.querySelectorAll(".image.shin-right")[0],
+        footR: document.querySelectorAll(".image.foot-right")[0],
+        thighL: document.querySelectorAll(".image.thigh-left")[0],
+        shinL: document.querySelectorAll(".image.shin-left")[0],
+        footL: document.querySelectorAll(".image.foot-left")[0],
     },
 
-    matchSkeleton: () => {
-        let image = character.image;
-        let skeleton = character.skeleton;
-        //match all images to all bones
-        character.matchBone(image.torsoF, skeleton.torso);
-        character.matchBone(image.torsoB, skeleton.torso);
-        character.matchBone(image.head, skeleton.head);
-        character.matchBone(image.mouth, skeleton.head);
-        character.matchBone(image.eyes, skeleton.eyes);
-        character.matchBone(image.bicepR, skeleton.bicepR);
-        character.matchBone(image.forearmR, skeleton.forearmR);
-        character.matchBone(image.bicepL, skeleton.bicepL);
-        character.matchBone(image.forearmL, skeleton.forearmL);
-        character.matchBone(image.thighR, skeleton.thighR);
-        character.matchBone(image.shinR, skeleton.shinR);
-        character.matchBone(image.footR, skeleton.footR);
-        character.matchBone(image.thighL, skeleton.thighL);
-        character.matchBone(image.shinL, skeleton.shinL);
-        character.matchBone(image.footL, skeleton.footL);
-        
+    switchCharacter: (oldName, newName) => {
+        let parts = Object.values(character.image);
+        for (let part of parts) {
+            part.classList.remove(oldName);
+            part.classList.add(newName);
+        }
     },
 
     /* ANIMATION NOTES: 
@@ -260,10 +139,16 @@ const character = {
         flailing: randomly swing each arm in a direction ~four times
     */
 
+    stop: () => { //kills all tweens on character parts
+        let parts = Object.values(character.skeleton);
+        for (let part of parts) {
+            gsap.killTweensOf(part);
+        }
+    },
+
     stand: (speed) => {
-        //animation for standing goes here
-        //should be built of several modular parts: legs, torso, etc on a half-second timeframe
-        let {torso, head, eyes, bicepR, bicepL, forearmR, forearmL, thighL, thighR, shinL, shinR, footL, footR} = character.skeleton;
+        //declaring variables
+        const {all, torso, head, eyes, mouth, bicepR, bicepL, forearmR, forearmL, thighL, thighR, shinL, shinR, footL, footR} = character.skeleton;
         let ease = "power1.inOut"
 
         let stand = gsap.timeline( {repeat: 0} ); 
@@ -271,7 +156,7 @@ const character = {
         let key1 = gsap.timeline( {repeat:0} ); //less crouched
 
             //torso/head
-            key1.to(torso, {rotation:10, bottom:"33%", left:"32.5%", duration:speed, ease: ease});
+            key1.to(torso, {rotation:8, bottom:"32%", left:"31.5%", duration:speed, ease: ease});
             key1.to(head, {rotation:-5, duration:speed, ease: ease}, '-=' + speed);
             
             //legs
@@ -284,8 +169,8 @@ const character = {
             key1.to(footR, {rotation:-6, duration:speed, ease: ease}, '-=' + speed);
             
             //arms
-            key1.to(bicepL, {rotation:-10, duration:speed, ease: ease}, '-=' + speed);
-            key1.to(forearmL, {rotation:-40, duration:speed, ease: ease}, '-=' + speed);
+            key1.to(bicepL, {rotation:10, duration:speed, ease: ease}, '-=' + speed);
+            key1.to(forearmL, {rotation:-50, duration:speed, ease: ease}, '-=' + speed);
 
             key1.to(bicepR, {rotation:20, duration:speed, ease: ease}, '-=' + speed);
             key1.to(forearmR, {rotation:-40, duration:speed, ease: ease}, '-=' + speed);
@@ -293,7 +178,7 @@ const character = {
         let key2 = gsap.timeline( {repeat:-1, yoyo: true} ); //more crouched
 
             //torso/head
-            key2.to(torso, {rotation:15, bottom:"32.5%", left:"32%", duration:speed, ease: ease});
+            key2.to(torso, {rotation:13, bottom:"31.5%", left:"30.5%", duration:speed, ease: ease});
             key2.to(head, {rotation:-10, duration:speed, ease: ease}, '-=' + speed);
             
             //legs
@@ -306,44 +191,335 @@ const character = {
             key2.to(footR, {rotation:-6, duration:speed, ease: ease}, '-=' + speed);
             
             //arms
-            key2.to(bicepL, {rotation:-10, duration:speed, ease: ease}, '-=' + speed);
-            key2.to(forearmL, {rotation:-40, duration:speed, ease: ease}, '-=' + speed);
+            key2.to(bicepL, {rotation:10, duration:speed, ease: ease}, '-=' + speed);
+            key2.to(forearmL, {rotation:-60, duration:speed, ease: ease}, '-=' + speed);
 
-            key2.to(bicepR, {rotation:20, duration:speed, ease: ease}, '-=' + speed);
-            key2.to(forearmR, {rotation:-40, duration:speed, ease: ease}, '-=' + speed);
+            key2.to(bicepR, {rotation:23, duration:speed, ease: ease}, '-=' + speed);
+            key2.to(forearmR, {rotation:-45, duration:speed, ease: ease}, '-=' + speed);
 
-        let eyeMove = gsap.timeline( {repeat: -1} );
+        //Shivering
+        let shiver = gsap.timeline( {repeat: 0} );
+
+        function wiggle(tl, target, distance, time) {
+            let shake = gsap.timeline( {repeat:-1} );
+            shake.to(target, {left:'+=' + distance + '%', duration: time/2});
+            shake.to(target, {left:'+=' + (-2*distance) + '%', duration: time/2, yoyo:true});
+            tl.add(shake, 0);
+        }
+        
+        //creating a combined shiver that doesn't have him skating all over the place
+        wiggle(shiver, bicepL, .5, .2);
+        wiggle(shiver, bicepR, .5, .2);
+        wiggle(shiver, thighR, -.5, .2);
+        wiggle(shiver, thighL, -.5, .2);
+        wiggle(shiver, all, .20, .2);
+
+        //adding everything to master stand timeline
+        stand.add(key1, 0);
+        stand.add(key2, ">");
+        stand.add(shiver, 0);
+
+        return stand;
+
+    },
+
+    run: (speed) => {
+        const {all, torso, head, eyes, mouth, bicepR, bicepL, forearmR, forearmL, thighL, thighR, shinL, shinR, footL, footR} = character.skeleton;
+
+        // let run = gsap.timeline();
+        let runLoop = gsap.timeline( {repeat:-1, repeatRefresh:true} ); //loops through keyframes indefinitely
+
+        let key1 = gsap.timeline();
+
+            let ease1 = "power1.out"
+
+            //torso/head
+            key1.to(torso, {rotation:-5, bottom:'39%', duration:speed, ease: ease1});
+            key1.to(head, {rotation:10, duration:speed, ease: ease1}, '-=' + speed);
+            key1.to(eyes, {left:"1.5%", duration:speed, ease:ease1}, '-=' + speed);
+            
+            //legs
+            key1.to(thighL, {rotation:-40, duration:speed, ease: ease1}, '-=' + speed);
+            key1.to(shinL, {rotation:0, duration:speed, ease: ease1}, '-=' + speed);
+            key1.to(footL, {rotation:-10, duration:speed, ease: ease1}, '-=' + speed);
+
+            key1.to(thighR, {rotation:38, duration:speed, ease: ease1}, '-=' + speed);
+            key1.to(shinR, {rotation:90, duration:speed, ease: ease1}, '-=' + speed);
+            key1.to(footR, {rotation:0, duration:speed, ease: ease1}, '-=' + speed);
+            
+            //arms
+            key1.to(bicepL, {rotation:80, duration:speed, ease: "none"}, '-=' + speed);
+            key1.to(forearmL, {rotation:-80, duration:speed, ease: "none"}, '-=' + speed);
+
+            key1.to(bicepR, {rotation:-40, duration:speed, ease: "none"}, '-=' + speed);
+            key1.to(forearmR, {rotation:-90, duration:speed, ease: "none"}, '-=' + speed);
+
+
+        const key2 = gsap.timeline();
+
+            let ease2 = "power1.in"
+
+            //torso/head
+            key1.to(torso, {rotation:-0, bottom:'-=7%', duration:speed, ease: ease2});
+            key1.to(head, {rotation:5, duration:speed, ease: ease2}, '-=' + speed);
+            
+            //legs
+            key1.to(thighL, {rotation:5, duration:speed, ease: ease2}, '-=' + speed);
+            key1.to(shinL, {rotation:5, duration:speed, ease: ease2}, '-=' + speed);
+            key1.to(footL, {rotation:0, duration:speed, ease: ease2}, '-=' + speed);
+
+            key1.to(thighR, {rotation:-10, duration:speed, ease: ease2}, '-=' + speed);
+            key1.to(shinR, {rotation:100, duration:speed, ease: ease2}, '-=' + speed);
+            key1.to(footR, {rotation:-10, duration:speed, ease: ease2}, '-=' + speed);
+            
+            //arms
+            key1.to(bicepL, {rotation:20, duration:speed, ease: "none"}, '-=' + speed);
+            key1.to(forearmL, {rotation:-80, duration:speed, ease: "none"}, '-=' + speed);
+
+            key1.to(bicepR, {rotation:20, duration:speed, ease: "none"}, '-=' + speed);
+            key1.to(forearmR, {rotation:-80, duration:speed, ease: "none"}, '-=' + speed);
+
+
+        const key3 = gsap.timeline();
+
+            let ease3 = "power1.out"
+
+            //torso/head
+            key1.to(torso, {rotation:-5, bottom:'+=7%', duration:speed, ease: ease3});
+            key1.to(head, {rotation:10, duration:speed, ease: ease3}, '-=' + speed);
+            
+            //legs
+            key1.to(thighL, {rotation:38, duration:speed, ease: ease3}, '-=' + speed);
+            key1.to(shinL, {rotation:90, duration:speed, ease: ease3}, '-=' + speed);
+            key1.to(footL, {rotation:0, duration:speed, ease: ease3}, '-=' + speed);
+
+            key1.to(thighR, {rotation:-40, duration:speed, ease: ease3}, '-=' + speed);
+            key1.to(shinR, {rotation:0, duration:speed, ease: ease3}, '-=' + speed);
+            key1.to(footR, {rotation:-10, duration:speed, ease: ease3}, '-=' + speed);
+            
+            //arms
+            key1.to(bicepL, {rotation:-40, duration:speed, ease: "none"}, '-=' + speed);
+            key1.to(forearmL, {rotation:-90, duration:speed, ease: "none"}, '-=' + speed);
+
+            key1.to(bicepR, {rotation:80, duration:speed, ease: "none"}, '-=' + speed);
+            key1.to(forearmR, {rotation:-80, duration:speed, ease: "none"}, '-=' + speed);
+
+
+        const key4 = gsap.timeline();
+
+            let ease4 = "power1.in"
+
+            //torso/head
+            key1.to(torso, {rotation:-0, bottom:'-=7%', duration:speed, ease: ease4});
+            key1.to(head, {rotation:5, duration:speed, ease: ease4}, '-=' + speed);
+            
+            //legs
+            key1.to(thighL, {rotation:-10, duration:speed, ease: ease4}, '-=' + speed);
+            key1.to(shinL, {rotation:100, duration:speed, ease: ease4}, '-=' + speed);
+            key1.to(footL, {rotation:-10, duration:speed, ease: ease4}, '-=' + speed);
+
+            key1.to(thighR, {rotation:5, duration:speed, ease: ease4}, '-=' + speed);
+            key1.to(shinR, {rotation:5, duration:speed, ease: ease4}, '-=' + speed);
+            key1.to(footR, {rotation:0, duration:speed, ease: ease4}, '-=' + speed);
+            
+            //arms
+            key1.to(bicepL, {rotation:20, duration:speed, ease: "none"}, '-=' + speed);
+            key1.to(forearmL, {rotation:-80, duration:speed, ease: "none"}, '-=' + speed);
+
+            key1.to(bicepR, {rotation:20, duration:speed, ease: "none"}, '-=' + speed);
+            key1.to(forearmR, {rotation:-80, duration:speed, ease: "none"}, '-=' + speed);
+
+
+        runLoop.add(key1);
+        runLoop.add(key2);
+        runLoop.add(key3);
+        runLoop.add(key4);
+
+        return runLoop;
+    },
+
+    lookAround: () => {
+        let tl = gsap.timeline( {repeat: -1} );
         function randomEye(tl) {
-            tl.to(eyes, { 
+            tl.to(character.skeleton.eyes, { 
                 left:(Math.random() - .5) * 5 + '%',
                 top: (Math.random() - .5) * 2.5 + '%',
+                overwrite: true,
                 onComplete: function() {
                     this.kill();
                     randomEye(tl);
                 }
             }, .5 );
-        };
-
-        // let shiver = gsap.timeline( {repeat: -1} );
-        
-
-        stand.add(randomEye(eyeMove));
-        stand.add(key1, 0);
-        stand.add(key2, ">");
-
-    },
-
-    run: (speed) => {
-        //animation for running goes here
+        }
+        randomEye(tl);
+        return tl;
     },
 
     fall: (speed) => {
         //animation for falling goes here
+        let fall = gsap.timeline();
+
+
+        let key1 = gsap.timeline();
+
+            let ease1 = "power1.out"
+
+            //torso/head
+            key1.to(torso, {rotation:-5, bottom:'39%', duration:speed, ease: ease1});
+            key1.to(head, {rotation:10, duration:speed, ease: ease1}, '-=' + speed);
+            key1.to(eyes, {left:"1.5%", duration:speed, ease:ease1}, '-=' + speed);
+            
+            //legs
+            key1.to(thighL, {rotation:-40, duration:speed, ease: ease1}, '-=' + speed);
+            key1.to(shinL, {rotation:0, duration:speed, ease: ease1}, '-=' + speed);
+            key1.to(footL, {rotation:-10, duration:speed, ease: ease1}, '-=' + speed);
+
+            key1.to(thighR, {rotation:38, duration:speed, ease: ease1}, '-=' + speed);
+            key1.to(shinR, {rotation:90, duration:speed, ease: ease1}, '-=' + speed);
+            key1.to(footR, {rotation:0, duration:speed, ease: ease1}, '-=' + speed);
+            
+            //arms
+            key1.to(bicepL, {rotation:80, duration:speed, ease: "none"}, '-=' + speed);
+            key1.to(forearmL, {rotation:-80, duration:speed, ease: "none"}, '-=' + speed);
+
+            key1.to(bicepR, {rotation:-40, duration:speed, ease: "none"}, '-=' + speed);
+            key1.to(forearmR, {rotation:-90, duration:speed, ease: "none"}, '-=' + speed);
+
+        // let key1 = gsap.timeline();
+
+        //     let ease1 = "power1.out"
+
+        //     //torso/head
+        //     key1.to(torso, {rotation:-5, bottom:'39%', duration:speed, ease: ease1});
+        //     key1.to(head, {rotation:10, duration:speed, ease: ease1}, '-=' + speed);
+        //     key1.to(eyes, {left:"1.5%", duration:speed, ease:ease1}, '-=' + speed);
+            
+        //     //legs
+        //     key1.to(thighL, {rotation:-40, duration:speed, ease: ease1}, '-=' + speed);
+        //     key1.to(shinL, {rotation:0, duration:speed, ease: ease1}, '-=' + speed);
+        //     key1.to(footL, {rotation:-10, duration:speed, ease: ease1}, '-=' + speed);
+
+        //     key1.to(thighR, {rotation:38, duration:speed, ease: ease1}, '-=' + speed);
+        //     key1.to(shinR, {rotation:90, duration:speed, ease: ease1}, '-=' + speed);
+        //     key1.to(footR, {rotation:0, duration:speed, ease: ease1}, '-=' + speed);
+            
+        //     //arms
+        //     key1.to(bicepL, {rotation:80, duration:speed, ease: "none"}, '-=' + speed);
+        //     key1.to(forearmL, {rotation:-80, duration:speed, ease: "none"}, '-=' + speed);
+
+        //     key1.to(bicepR, {rotation:-40, duration:speed, ease: "none"}, '-=' + speed);
+        //     key1.to(forearmR, {rotation:-90, duration:speed, ease: "none"}, '-=' + speed);
+
+
+        return fall;
     },
 
     flail: (speed) => {
-        //arms animation - semi-randomly sends arms waggling
-        //aim for inflatable tube man
+        //one function adds all tweens, then kills them and adds them again
+        //each tween is a function
+        let tl = gsap.timeline( {repeat: -1, repeatRefresh: true} );
+
+        let resetRotation = (node) => {
+            let currentRotation = parseFloat(node.style.transform.substring(7));
+            let newRotation = currentRotation % 360;
+            node.style.transform = "rotate(" + newRotation + 'deg)';
+        }
+
+        function randomArmL(tl, speed) {
+            tl.to(character.skeleton.bicepL, { 
+                rotate: '+=' + ((Math.random() * 720) - 360),
+                overwrite: true,
+                duration: speed,
+                ease:"none",
+                onComplete: function() {
+                    // this.kill();
+                }
+            }, );
+            
+            tl.to(character.skeleton.forearmL, { 
+                rotate: (Math.random() * -100),
+                overwrite: true,
+                duration: speed,
+                ease:"none",
+                onComplete: function() {
+
+                    resetRotation(character.skeleton.bicepL);
+                    resetRotation(character.skeleton.forearmL);
+
+                    this.kill();
+                    randomArmL(tl, speed);
+                }
+            }, '-=' + speed );
+        }
+
+        function randomArmR(tl, speed) {
+            tl.to(character.skeleton.bicepR, { 
+                rotate: '+=' + ((Math.random() * 720) - 360),
+                overwrite: true,
+                duration: speed,
+                ease:"none",
+                onComplete: function() {
+                    // this.kill();
+                }
+            }, '-=' + speed );
+            
+            tl.to(character.skeleton.forearmR, { 
+                rotate: (Math.random() * -100),
+                overwrite: true,
+                duration: speed,
+                ease:"none",
+                onComplete: function() {
+                    
+                    resetRotation(character.skeleton.bicepR);
+                    resetRotation(character.skeleton.forearmR);
+
+                    this.kill();
+                    randomArmR(tl, speed);
+                }
+            }, '-=' + speed );
+
+        }
+
+        randomArmR(tl, speed);
+        randomArmL(tl, speed);
+        return tl;
+        // function randomArm(tl) {
+        //     let flail = gsap.timeline( {
+        //         repeat: 0, 
+        //         repeatRefresh: true, 
+        //         onRepeat: function() {
+        //             this.kill();
+        //             flailAll(tl);
+        //     }});
+
+        //     flail.to(character.skeleton.bicepL, {
+        //         rotate: (Math.random() * 360) - 180,
+        //         overwrite: true
+        //     }, speed);
+
+        //     flail.to(character.skeleton.bicepR, {
+        //         rotate: (Math.random() * 360) - 180,
+        //         overwrite: true
+        //     }, '-=' + speed);
+
+        //     flail.to(character.skeleton.forearmR, {
+        //         rotate: (Math.random() * -145),
+        //         overwrite: true
+        //     }, '-=' + speed);
+
+        //     flail.to(character.skeleton.forearmR, {
+        //         rotate: (Math.random() * -145),
+        //         overwrite: true
+        //     }, '-=' + speed);
+
+        // // leftBicep(flail);
+        // // rightBicep(flail);
+        // // leftForearm(flail);
+        // // rightForearm(flail);
+
+        // return flail;
+
+        //periodically rotate biceps anywhere and forearms within a 145 degree arc
     },
 
     yell: () => {
@@ -358,6 +534,12 @@ const character = {
 }
 
 //word pieces and buttons
+const preloader = document.getElementById("preloader");
+
+const action = document.getElementById("action");
+const controller = document.getElementById("controller");
+
+const topWords = document.getElementById("top-words");
 const titleDisplay = document.getElementById("game-title");
 const scoreDisplay = document.getElementById("score");
 
@@ -370,15 +552,22 @@ const flailButton = document.getElementById("control__flail");
 const eyesButton = document.getElementById("control__eyes");
 const yellButton = document.getElementById("control__yell");
 const cryButton = document.getElementById("control__cry");
+const plaque = document.getElementById("control__plaque");
 
 //GAME functions -------------------------------------------
+//tracking variables, helper functions, event-listeners
 
-bg.getPositions();
-bg.getWidths();
-character.matchSkeleton(); //setup stuff
+let gameReady = false; //for disabling running until game is set/reset
+// let animation = gsap.timeline(); //character animation - to keep all the disparate timelines in one place
+let bgAnimation = gsap.timeline({repeat:-1}); //bg animation, for repeating scroll
 
 let running = false; //for tracking mouseUps that might be outside button 
-let gameReady = false; //for disabling running until game is set/reset
+let flailing = false;
+let eyesShut = false;
+let yelling = false;
+let crying = false;
+
+
 
 const loadingImage = () => {
     //loader animation
@@ -386,88 +575,206 @@ const loadingImage = () => {
     //and the word 'loading' animated above
 }
 
-//on load, remove preloader and bring in beginning screen
-window.onload = () => {
-    //
-    //animate character select/title/etc
-    //up from bottom 
-    //at end, set gameREady to true
+const fadeIn = () => {
+    preloader.style.opacity = 1;
+    preloader.style.display = "block";
+    let tl = gsap.timeline();
+    tl.to(preloader, {opacity:0, duration:1}, .3);
+    tl.set(preloader, {display:"none"});
+    tl.fromTo(charSelectMenu, {opacity:0, x:"", bottom:"3%"}, {opacity:1, duration:.4}, .7);
+    tl.fromTo(topWords, {opacity:0, x:"", bottom:"3%"}, {opacity:1, duration:.4}, .7);
+    return tl;
+}
+
+// const killAnimations = () => {
+//     for (let child of animation.getChildren()) {
+//         child.kill();
+//     }
+// }
+
+const resetGame = () => { //also used on first load
+    gsap.killTweensOf("*"); //kill all animations
+    fadeIn();
+    character.skeleton.all.style.left = parseFloat(getComputedStyle(character.skeleton.all).width) / -2 + "px";
+    bg.getWidths();
+
+    character.stand(.25);
+    character.lookAround();
+    running = false;
+    flailing = false;
+    eyesShut = false;
+    yelling = false;
+    crying = false;
+    
     gameReady = true;
+
+}
+
+window.oncontextmenu = () => {
+    return false;
+}
+
+window.onload = () => {
+    resetGame();
+    //have spotlight flicker on, revealing character, fade up on buttons at same time
+}
+
+window.onresize = () => {
+    //to fix bug where resizing wouldn't recenter character, 
+    //because character's left prop was still being animated
+    //but since you shouldn't be able to run and resize the window
+    //at the same time, resetting the game seems fine.
+    resetGame();
 }
 
 //CHARACTER SELECT -----------------------------------------
 
+const characters = ["man", "woman"]
+let currentCharacter = 0
+
+// NEXT CHARACTER
 nextCharButton.addEventListener("click", () => {
-    //slide character off left, 
-    //change class from ex man to woman
-    //new character in from right
-    //slide background to match
-    console.log("Next Character");
+    
+    let person = character.skeleton.all;
+    let tl = gsap.timeline();
+
+    tl.to(person, {x: "-=" + window.innerWidth, duration: .3});
+    tl.call( () => {
+        let lastCharacter = currentCharacter;
+        currentCharacter++;
+        if (currentCharacter >= characters.length) currentCharacter = 0;
+        character.switchCharacter(characters[lastCharacter], characters[currentCharacter]);
+    })
+    tl.set(person, {x: window.innerWidth});
+    tl.to(person, {x: 0, duration: .6});
+    tl.add(bg.scroll("power2.out", 60, .9), 0);
 })
 
+// PREVIOUS CHARACTER
 prevCharButton.addEventListener("click", () => {
-    //slide character off right, 
-    //change class from ex man to woman
-    //new character in from left
-    //slide background to match
-    console.log("Previous Character");
+
+    let person = character.skeleton.all;
+    let tl = gsap.timeline();
+
+    tl.to(person, {x: "+=" + window.innerWidth, duration: .3});
+    tl.call( () => {
+        let lastCharacter = currentCharacter;
+        currentCharacter++;
+        if (currentCharacter >= characters.length) currentCharacter = 0;
+        character.switchCharacter(characters[lastCharacter], characters[currentCharacter]);
+    })
+    tl.set(person, {x: -window.innerWidth});
+    tl.to(person, {x: 0, duration: .6});
+    tl.add(bg.scroll("power2.out", -60, .9), 0);
 });
 
 //RUNNING/ETC ----------------------------------------------
 
 runButton.addEventListener("mousedown", () => {
     if (gameReady == true) {
-        running = true;
-        console.log("Running:", running)
-        //set running to true, for later mouse-up stuff
-        //start run animation
-        //character.run
-        //background.scroll
-        //move character select left, 
+        gsap.to(charSelectMenu, {x: -window.innerWidth, ease:"power0.out", duration:.4});
+        gsap.to(topWords, {x: -window.innerWidth, ease:"power0.out", duration:.5});
+        console.log("Running:", running);
+
+        // killAnimations();  //cancelled the killed animations because the combined animation looks funnier/more scared
+        
+        // animation.add(character.run(.17));
+        // character.stop();
+        // animation.kill();
+        // animation.add(character.run(1),">");
+        character.run(.17);
+        bgAnimation.add(bg.scroll("none", 100, 5));
+        //remove character select
         //bring score in from right
+        running = true;
     }
 });
 
 window.addEventListener("mouseup", () => {
-    if (running == true) {
-        running = false;
-        gameReady = false;
-        console.log("Running:", running)
+    // if (running == true) {
+    //     running = false;
+    //     gameReady = false;
+    //     console.log("Running:", running)
         //character.fall, move offscreen
         //reposition as next character, scroll in
         //also scroll in character select, game title
         //background.scroll to match
-    }
+    // }
 })
 
 //OTHER BUTTONS --------------------------------------------
+let flailTimeline;
 
 flailButton.addEventListener("click", () => {
-    //trigger flail animation
-    console.log("Flail");
+    if (running) {
+        if (!flailing) {
+            flailTimeline = gsap.timeline();
+            flailTimeline.add(character.flail(.2), 0);
+            flailing = true;
+            console.log("Flail start");
+        }
+        else {
+            character.stop();
+            character.run(.17);
+            // flailTimeline.kill();
+            flailing = false;
+            console.log("Flail stop");
+        }
+    }
 });
 
 cryButton.addEventListener("click", () => {
+
     //trigger cry animation
     //spawn tears that splash on ground
     console.log("Cry");
 });
 
-eyesButton.addEventListener("click", () => {
+eyesButton.addEventListener("click", () => {    
+    if (!eyesShut) {
+        action.style.opacity = 0;
+        controller.style.backgroundImage = "none";
+        controller.style.borderImage = "none";
+        cryButton.style.backgroundImage = "none";
+        yellButton.style.backgroundImage = "none";
+        flailButton.style.backgroundImage = "none";
+        runButton.style.backgroundImage = "none";
+        plaque.style.backgroundImage = "none";
+        eyesShut = true;
+    }
+    else {
+        action.style.opacity = 1;
+        controller.style.backgroundImage = "";
+        controller.style.borderImage = "";
+        cryButton.style.backgroundImage = "";
+        yellButton.style.backgroundImage = "";
+        flailButton.style.backgroundImage = "";
+        runButton.style.backgroundImage = "";
+        plaque.style.backgroundImage = "";
+        eyesShut = false;
+    }
     //black out everything
     //except eyes and an open eyes button
     console.log("Eyes");
 });
 
 yellButton.addEventListener("click", () => {
+    if (!yelling) {
+        character.image.mouth.className = character.image.mouth.className.replace( /(?:^|\s)mouth(?!\S)/g , 'mouth-big' )
+        yelling = true;
+    } else {
+        character.image.mouth.className = character.image.mouth.className.replace( /(?:^|\s)mouth-big(?!\S)/g , 'mouth' )
+        yelling = false;
+    }
     //trigger yell animation
     //spawn letters for yell
     console.log("Yell");
 });
 
 
-let tl = gsap.timeline( {repeat:-1});
-tl.to(character.skeleton.torso, {rotation:360, ease: "none", duration:10})
-setInterval(function() {character.matchSkeleton()}, 40)
-// character.stand(.75);
+// let tl = gsap.timeline( {repeat:-1});
+// tl.to(character.skeleton.torso, {rotation:360, ease: "none", duration:10})
+// setInterval(function() {character.matchSkeleton()}, 40)
+// character.stand(.50);
+// tl = character.run(.5);
 

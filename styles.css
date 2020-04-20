@@ -6,6 +6,7 @@
 html, body {
   height: 100%;
   text-align: center;
+  background-color: black;
 }
 
 /* body {
@@ -20,12 +21,24 @@ main {
   background-color: transparent;
   height: 100%;
   width: 100%;
+  overflow: hidden;
+}
+
+/* PRELOADER */
+#preloader {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: black;
+  z-index: 100000;
 }
 
 /* BACKGROUND BITS */
 #action {
   position: relative;
   height: 66%;
+  background-image: url(img/bg/bgwatercolor.jpg);
+  background-size: cover;
 }
 #action > * {
   position: absolute;
@@ -75,13 +88,6 @@ main {
 }
 
 /* CHARACTER BITS */
-#character * {
-  position: absolute;
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
 /* using sass to automate background-image names*/
 .man.torso-front {
   background-image: url(img/man/man-torso-front.png);
@@ -103,16 +109,20 @@ main {
   background-image: url(img/man/man-mouth.png);
   background-size: 100%;
 }
+.man.mouth-big {
+  background-image: url(img/man/man-mouth-big.png);
+  background-size: 100%;
+}
 .man.bicep {
   background-image: url(img/man/man-bicep.png);
   background-size: 100%;
 }
-.man.forearm-back {
-  background-image: url(img/man/man-forearm-back.png);
+.man.forearm-right {
+  background-image: url(img/man/man-forearm-right.png);
   background-size: 100%;
 }
-.man.forearm-front {
-  background-image: url(img/man/man-forearm-front.png);
+.man.forearm-left {
+  background-image: url(img/man/man-forearm-left.png);
   background-size: 100%;
 }
 .man.thigh {
@@ -148,16 +158,20 @@ main {
   background-image: url(img/woman/woman-mouth.png);
   background-size: 100%;
 }
+.woman.mouth-big {
+  background-image: url(img/woman/woman-mouth-big.png);
+  background-size: 100%;
+}
 .woman.bicep {
   background-image: url(img/woman/woman-bicep.png);
   background-size: 100%;
 }
-.woman.forearm-back {
-  background-image: url(img/woman/woman-forearm-back.png);
+.woman.forearm-right {
+  background-image: url(img/woman/woman-forearm-right.png);
   background-size: 100%;
 }
-.woman.forearm-front {
-  background-image: url(img/woman/woman-forearm-front.png);
+.woman.forearm-left {
+  background-image: url(img/woman/woman-forearm-left.png);
   background-size: 100%;
 }
 .woman.thigh {
@@ -173,7 +187,7 @@ main {
   background-size: 100%;
 }
 
-#skeleton, #character {
+#character {
   height: 500px;
   width: 500px;
   bottom: 0%;
@@ -181,96 +195,103 @@ main {
   left: -250px;
 }
 
-#skeleton * {
+#character * {
   position: absolute;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-  border: 1px red solid;
 }
 
-#skeleton__torso {
+.image {
+  width: 100%;
+  height: 100%;
+}
+
+.bone.torso {
   width: 35%;
   height: 35%;
-  bottom: 35%;
+  bottom: 32%;
   left: 32.5%;
 }
-#skeleton__head {
+.bone.head {
   height: 61.5%;
   width: 80%;
   bottom: 80%;
   left: 12%;
+  transform-origin: 55% 80%;
 }
-#skeleton__eyes {
+.bone.eyes, .bone.mouth {
   height: 100%;
   width: 100%;
   left: 0;
   top: 0;
 }
-#skeleton__bicep-right {
+.bone.bicep-right {
   width: 45%;
   height: 53.8%;
   top: 10.5%;
   left: 20%;
   transform-origin: 50% 20%;
+  z-index: 1000;
 }
-#skeleton__forearm-right {
+.bone.forearm-right {
   width: 100%;
   height: 100%;
   top: 65%;
   right: 3%;
   transform-origin: 50% 18%;
 }
-#skeleton__bicep-left {
+.bone.bicep-left {
   width: 45%;
   height: 53.8%;
   top: 10.5%;
   left: 38%;
   transform-origin: 50% 20%;
+  z-index: -1000;
 }
-#skeleton__forearm-left {
+.bone.forearm-left {
   width: 100%;
   height: 100%;
   top: 65%;
   right: 3%;
   transform-origin: 50% 18%;
 }
-#skeleton__thigh-right {
+.bone.thigh-right {
   width: 45%;
   height: 69.2%;
   top: 50%;
   left: 23%;
   transform-origin: 55% 20%;
 }
-#skeleton__shin-right {
+.bone.shin-right {
   width: 100%;
   height: 100%;
   right: 0.1%;
   top: 68%;
   transform-origin: 53% 21%;
 }
-#skeleton__foot-right {
+.bone.foot-right {
   width: 70%;
   height: 30%;
   top: 58%;
   left: 28%;
   transform-origin: 30% 50%;
 }
-#skeleton__thigh-left {
+.bone.thigh-left {
   width: 45%;
   height: 69.2%;
   top: 50%;
   left: 29%;
   transform-origin: 55% 20%;
 }
-#skeleton__shin-left {
+.bone.shin-left {
   width: 100%;
   height: 100%;
   right: 0.1%;
   top: 68%;
   transform-origin: 53% 21%;
 }
-#skeleton__foot-left {
+.bone.foot-left {
   width: 70%;
   height: 30%;
   top: 58%;
@@ -278,14 +299,12 @@ main {
   transform-origin: 30% 50%;
 }
 
-.graphic {
-  position: absolute;
-}
-
 /* BUTTONS AND CONTROLS */
 #controller {
   position: relative;
   display: grid;
+  justify-items: center;
+  justify-content: center;
   grid-template-columns: 25% 50% 25%;
   grid-template-rows: 42% 42% 1em;
   background-image: url("img/controls/woodtexture.gif");
@@ -300,31 +319,48 @@ main {
   border: none;
 }
 #controller .smallbutton {
-  background-size: cover;
-}
-#controller #control__flail {
-  grid-area: 1/1/2/2;
-  background-image: url("img/controls/button-flail.png");
-}
-#controller #control__eyes {
-  grid-area: 2/1/3/2;
-}
-#controller #control__run {
-  grid-area: 1/2/3/3;
-}
-#controller #control__cry {
-  grid-area: 2/3/3/4;
+  background-size: 400%;
+  height: 100px;
+  width: 88px;
 }
 #controller #control__centerdiv {
   grid-area: 1/2/3/3;
+  height: 200px;
+  width: 160px;
+}
+#controller #control__flail {
+  grid-area: 1/1/span 1/span 1;
+  background-image: url("img/controls/buttons.png");
+  background-position: 100% 0%;
+}
+#controller #control__eyes {
+  grid-area: 2/1/span 1/span 1;
+  background-image: url("img/controls/buttons.png");
+  background-position: 1% 34%;
+}
+#controller #control__yell {
+  grid-area: 1/3/span 1/span 1;
+  background-image: url("img/controls/buttons.png");
+  background-position: 1% 0%;
+}
+#controller #control__cry {
+  grid-area: 2/3/span 1/span 1;
+  background-image: url("img/controls/buttons.png");
+  background-position: 100% 34%;
 }
 #controller #control__plaque {
   width: 100%;
-  height: 30%;
+  height: 33%;
+  background-image: url("img/controls/buttons.png");
+  background-size: 200%;
+  background-position: 50% 0%;
 }
 #controller #control__run {
   width: 100%;
-  height: 70%;
+  height: 60%;
+  background-image: url("img/controls/buttons.png");
+  background-size: 200%;
+  background-position: 50% 25%;
 }
 #controller #control__footer {
   grid-area: 3/1/4/4;

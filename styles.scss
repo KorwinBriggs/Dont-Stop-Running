@@ -7,6 +7,7 @@
 html, body {
     height: 100%;
     text-align: center;
+    background-color:black;
 }
 
 /* body {
@@ -22,15 +23,28 @@ main {
     background-color: transparent;
     height: 100%;
     width: 100%;
-    // overflow: hidden;
+    overflow: hidden;
 }
 
+
+/* PRELOADER */
+
+#preloader {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: black;
+    z-index: 100000;
+}
 
 /* BACKGROUND BITS */
 
 #action {
     position: relative;
     height:66%;
+
+    background-image: url(img/bg/bgwatercolor.jpg);
+    background-size: cover;
     // overflow: hidden;
 
     &>* {
@@ -87,27 +101,11 @@ main {
     }
 
 
-
-
 /* CHARACTER BITS */
-
-// #character {
-//     width:100%;
-//     height:100%;
-//     margin: auto;
-// }
-
-#character * {
-    position: absolute;
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-
-}
 
 /* using sass to automate background-image names*/
 $character-prefixes: "man", "woman";
-$body-part-suffixes: "torso-front", "torso-back", "head", "eyes", "mouth", "bicep", "forearm-back", "forearm-front", "thigh", "shin", "foot";
+$body-part-suffixes: "torso-front", "torso-back", "head", "eyes", "mouth", "mouth-big", "bicep", "forearm-right", "forearm-left", "thigh", "shin", "foot";
 
 @each $prefix in $character-prefixes {
     .#{$prefix} {
@@ -124,7 +122,7 @@ $body-part-suffixes: "torso-front", "torso-back", "head", "eyes", "mouth", "bice
 // to keep everything positioned where it should be regardless 
 // of screen-size
 
-#skeleton, #character { 
+#character { 
     //change these values at cutoff points to support different devices
     height:500px;
     width:500px;
@@ -134,48 +132,53 @@ $body-part-suffixes: "torso-front", "torso-back", "head", "eyes", "mouth", "bice
 }
 
 
-#skeleton * {
+#character * {
     position: absolute;
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
-
-    border: 1px red solid;
+    // border: 1px red solid;
 }
 
-#skeleton__ {
+.image {
+    width:100%;
+    height:100%;
+}
 
-    &torso {
+.bone {
+
+    &.torso {
         width:35%;
         height:35%;
-        bottom:35%;
+        bottom:32%;
         left:32.5%;
     }
 
-    &head {
+    &.head {
         height:61.5%;
         width:80%;
         bottom:80%;
         left: 12%;
-        // transform-origin: 55% 80%;
+        transform-origin: 55% 80%;
     }
 
-    &eyes {
+    &.eyes, &.mouth {
         height:100%;
         width:100%;
         left:0;
         top:0;
     }
 
-    &bicep-right {
+    &.bicep-right {
         width: 45%;
         height: 53.8%;
         top:10.5%;
         left:20%;
         transform-origin: 50% 20%;
+        z-index: 1000;
     }
 
-    &forearm-right {
+    &.forearm-right {
         width: 100%;
         height: 100%;
         top:65%;
@@ -183,15 +186,16 @@ $body-part-suffixes: "torso-front", "torso-back", "head", "eyes", "mouth", "bice
         transform-origin: 50% 18%;
     }
 
-    &bicep-left {
+    &.bicep-left {
         width: 45%;
         height: 53.8%;
         top:10.5%;
         left:38%;
         transform-origin: 50% 20%;
+        z-index: -1000;
     }
 
-    &forearm-left {
+    &.forearm-left {
         width: 100%;
         height: 100%;
         top:65%;
@@ -199,7 +203,7 @@ $body-part-suffixes: "torso-front", "torso-back", "head", "eyes", "mouth", "bice
         transform-origin: 50% 18%;
     }
 
-    &thigh-right {
+    &.thigh-right {
         width: 45%;
         height: 69.2%;
         top:50%;
@@ -207,7 +211,7 @@ $body-part-suffixes: "torso-front", "torso-back", "head", "eyes", "mouth", "bice
         transform-origin: 55% 20%;
     }
 
-    &shin-right {
+    &.shin-right {
         width: 100%;
         height: 100%;
         right:.1%;
@@ -215,7 +219,7 @@ $body-part-suffixes: "torso-front", "torso-back", "head", "eyes", "mouth", "bice
         transform-origin: 53% 21%;
     }
 
-    &foot-right {
+    &.foot-right {
         width: 70%;
         height: 30%;
         top:58%;
@@ -223,7 +227,7 @@ $body-part-suffixes: "torso-front", "torso-back", "head", "eyes", "mouth", "bice
         transform-origin: 30% 50%;
     }
 
-    &thigh-left {
+    &.thigh-left {
         width: 45%;
         height: 69.2%;
         top:50%;
@@ -231,7 +235,7 @@ $body-part-suffixes: "torso-front", "torso-back", "head", "eyes", "mouth", "bice
         transform-origin: 55% 20%;
     }
 
-    &shin-left {
+    &.shin-left {
         width: 100%;
         height: 100%;
         right:.1%;
@@ -239,7 +243,7 @@ $body-part-suffixes: "torso-front", "torso-back", "head", "eyes", "mouth", "bice
         transform-origin: 53% 21%;
     }
 
-    &foot-left {
+    &.foot-left {
         width: 70%;
         height: 30%;
         top:58%;
@@ -249,17 +253,14 @@ $body-part-suffixes: "torso-front", "torso-back", "head", "eyes", "mouth", "bice
 
 }
 
-.graphic {
-    position: absolute;
-}
-
 /* BUTTONS AND CONTROLS */
-
 
 
 #controller {
     position: relative;
     display: grid;
+    justify-items: center;
+    justify-content: center;
     grid-template-columns: 25% 50% 25%;
     grid-template-rows: 42% 42% 1em;
     background-image: url("img/controls/woodtexture.gif");
@@ -275,38 +276,58 @@ $body-part-suffixes: "torso-front", "torso-back", "head", "eyes", "mouth", "bice
     }
 
     .smallbutton {
-        background-size: cover;
-    }
-
-    #control__flail {
-        grid-area: 1/1/2/2;
-        background-image: url("img/controls/button-flail.png");
-    }
-
-    #control__eyes {
-        grid-area: 2/1/3/2;
-    }
-
-    #control__run {
-        grid-area: 1/2/3/3;
-    }
-
-    #control__cry {
-        grid-area: 2/3/3/4;
+        background-size: 400%;
+        height:100px;
+        width:88px;
+        // height:100%;
+        // width:100%;
     }
 
     #control__centerdiv {
         grid-area: 1/2/3/3;
+        height:200px;
+        width:160px;
+
+    }
+
+    #control__flail {
+        grid-area: 1/1/span 1/span 1;
+        background-image: url("img/controls/buttons.png");
+        background-position: 100% 0%;
+    }
+
+    #control__eyes {
+        grid-area: 2/1/span 1/span 1;
+        background-image: url("img/controls/buttons.png");
+        background-position: 1% 34%;
+    }
+
+    #control__yell {
+        grid-area: 1/3/span 1/span 1;
+        background-image: url("img/controls/buttons.png");
+        background-position: 1% 0%;
+    }
+
+    #control__cry {
+        grid-area: 2/3/span 1/span 1;
+        background-image: url("img/controls/buttons.png");
+        background-position: 100% 34%;
     }
 
     #control__plaque {
         width:100%;
-        height:30%;
+        height:33%;
+        background-image: url("img/controls/buttons.png");
+        background-size: 200%;
+        background-position: 50% 0%;
     }
 
     #control__run {
         width:100%;
-        height:70%;
+        height:60%;
+        background-image: url("img/controls/buttons.png");
+        background-size: 200%;
+        background-position: 50% 25%;
     }
 
     #control__footer {
